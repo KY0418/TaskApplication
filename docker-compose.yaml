@@ -16,6 +16,7 @@ services:
     platform: linux/x86_64
     environment:  
       MySQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: 'demo'
       TZ: 'Asia/Tokyo'
     volumes: 
