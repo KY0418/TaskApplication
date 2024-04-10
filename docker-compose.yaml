@@ -16,8 +16,8 @@ services:
     platform: linux/x86_64
     container_name: mysql_server
     environment:  
-      #MySQL_ALLOW_EMPTY_PASSWORD: 'yes'
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      #MYSQL_ROOT_PASSWORD: password
       #MYSQL_USER: kaneko
       #MYSQL_PASSWORD: pass
       MYSQL_DATABASE: 'demo'
