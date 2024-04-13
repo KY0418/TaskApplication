@@ -217,6 +217,16 @@ files = [
 ]
 
 [[package]]
+name = "peewee"
+version = "3.17.1"
+description = "a little orm"
+optional = false
+python-versions = "*"
+files = [
+    {file = "peewee-3.17.1.tar.gz", hash = "sha256:e009ac4227c4fdc0058a56e822ad5987684f0a1fbb20fed577200785102581c3"},
+]
+
+[[package]]
 name = "pydantic"
 version = "2.6.4"
 description = "Data validation using Python type hints"
@@ -781,4 +791,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "84870241dbdd1b96aac3ddb8cbef069d0bd77f192c3c6983945cf19cf1467857"
+content-hash = "0d2041dedf23c7ad0e0d3fed21d8109a9a45c8fa98b217e0393ccb41b6116ec0"
