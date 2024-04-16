@@ -2,16 +2,19 @@ from fastapi import APIRouter,Depends,HTTPException
 from peewee import *
 import api.schemas.task as task_schema
 import api.cruds.task as task_crud
-
+import logging
+logger = logging.getLogger(__name__)
 from api.db import get_db
 
 db = PostgresqlDatabase("task_data",user="kaneko",password="goldsilver",host="postgresql",port=5432,autoconnect=True)
 
 router = APIRouter()
 
-@router.get("/tasks",response_model=list[task_schema.Task])
-async def list_tasks(db:PostgresqlDatabase=Depends(get_db)):
-    return await task_crud.get_tasks_with_done(db)
+@router.get("/tasks")
+async def list_tasks():
+    logger.info("test")
+    return task_crud.get_tasks_with_done()
+    #return True
 
 @router.post("/tasks",response_model=task_schema.TaskCreateResponse)
 async def create_task(task_body: task_schema.TaskCreate,db: PostgresqlDatabase=Depends(get_db)):
