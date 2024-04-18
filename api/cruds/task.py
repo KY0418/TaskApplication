@@ -1,44 +1,66 @@
+from asyncio import Task
+from copyreg import constructor
+from turtle import title
+from fastapi.background import P
 from peewee import *
 import api.models.task as task_model
 import api.schemas.task as task_schema
+from typing import List
 
 async def create_task(db:PostgresqlDatabase,task_create:
                 task_schema.TaskCreate) -> task_model.Task:
+    #print(f"データベースオブジェクト: {db}")
     task = task_model.Task(**task_create.dict())
     task.save()
-    await db.commit()
+    print(task)
     return task
 
-def get_tasks_with_done() -> str:
-    # result = (task_model.Task.
-    #     Select(
-    #         task_model.Task.id,
-    #         task_model.Task.title,
-    #         ).join(task_model.Done.id == task_model.Task.id).where(task_model.Done.task != None))
+async def get_tasks_with_done() -> List[task_model.Task]:
+    #aa = list[]
+    print(task_model.Task.id)
+    result = (task_model.Task
+             .select(
+                task_model.Task.id,
+                task_model.Task.title,
+                task_model.Done.id 
+            )
+            .join(task_model.Done, on=(task_model.Task.id == task_model.Done.id),join_type=JOIN.LEFT_OUTER)
+            #.objects(constructor=task_model.Task)
+            .where(task_model.Done.id.is_null() == False)
+    )
     
     #result = list(result)
-    print("test")
-
-    return "test"
+    #print("test")
+    return [ (i.id,i.title) for i in result ]
 
 async def update_task(db:PostgresqlDatabase,task_create:task_schema.TaskCreate,
-             original:task_model.Task)-> task_model.Task:
-    original.title = task_create.title
-    original.update()
-    await db.commit()
-    db.close()
+                        original:task_model.Task,task_id:int)-> task_model.Task:
+    task = task_model.Task.get(task_model.Task.id == task_id)
+    task.title = task_create.title
+    original = task_create.title
+    #task_model.Task.update(title=original).where(task_model.Task.id == task_id)
+    #task = task_model.Task(title=original)
+    task.save()
     return original
 
-async def get_task(task_id:int) -> task_model.Task | None:
-    result = (task_model.
-              Select(task_model.Task).where(task_model.Task.id == task_id))
+async def get_task(task_id:int) -> List[task_model.Task] | None:
+    result = (task_model.Task.
+              select(task_model.Task).where(task_model.Task.id == task_id))
     #result = ResultIterator(result)
     
-    return result 
+    return [ (i.title) for i in result ]
 
-#get_taskはresult が返す値を絞り込む必要がある
+async def delete_task(db: PostgresqlDatabase,original: int) -> None:
+    task = task_model.Task.get(task_model.Task.id == original)
+    task.delete_instance()
+    task.save()
+    #task_model.Task.delete().where(task_model.Task.id == original)
+    #task_model.Task.create_table()
 
-async def delete_task(db: PostgresqlDatabase,original: task_model.Task) -> None:
-    original.delete()
-    db.commit()
+async def get_task_del(task_id:int) -> List[task_model.Task] | None:
+    result = (task_model.Task.
+              select(task_model.Task).where(task_model.Task.id == task_id))
+    #result = ResultIterator(result)
+    
+    return [ (i.id) for i in result ]
    

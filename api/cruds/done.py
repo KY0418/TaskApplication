@@ -1,22 +1,21 @@
 from peewee import *
+from typing import List
 
 import api.models.task as task_model
 
-async def get_done(task_id: int) -> task_model.Done | None:
-    result = (task_model.Select(
-        task_model.Done).where(task_model.Done.id == task_id)
-    )
-
-    return result
+async def get_done(task_id: int) -> List[task_model.Done] | None:
+    result = task_model.Done.get(id = task_id)
+    
+    return [ i for i in result ] 
 
 async def create_done(db: PostgresqlDatabase,task_id:int) -> task_model.Done:
     done = task_model.Done(id=task_id)
-    done.save()
-    await db.commit()
+    await done.save()
     
     return done
 
 async def delete_done(db: PostgresqlDatabase,original:task_model.Done) -> None:
-    original.delete()
-    await db.commit()
+    done = task_model.Done.get(id = original)
+    done.delete_instance()
+    await done.save()
     
