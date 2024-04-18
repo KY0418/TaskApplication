@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict,Field
 
 class TaskBase(BaseModel):
-    title : str | None = Field(None,json_schema_extra={"examples":"クリーニングを取りに行く"})
+    title : str | None = Field(None,json_schema_extra="クリーニングを取りに行く")
 
 class TaskCreate(TaskBase):
     pass
@@ -15,7 +15,7 @@ class TaskCreateResponse(TaskCreate):
 
 class Task(TaskBase):
     id : int
-    done: bool = Field(json_schema_extra={"description":"完了フラグ"})
+    done: bool = Field(default=False,json_schema_extra={"description":"完了フラグ"})
     class ConfigDict:
         from_attributes = True
     #config :ConfigDict = ConfigDict(from_attributes=True)

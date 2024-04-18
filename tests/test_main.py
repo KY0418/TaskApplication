@@ -1,7 +1,7 @@
 
 import pytest
 import pytest_asyncio
-from httpx import AsyncClient
+from httpx import AsyncClient,ASGITransport
 from peewee import *
 import starlette.status
 
@@ -27,7 +27,7 @@ async def async_client() -> AsyncClient:
 
     app.dependency_overrides[get_db] = get_test_db
 
-    async with AsyncClient(app=app,base_url="http//test") as client:
+    async with AsyncClient(transport=ASGITransport(app=app),base_url="http://test") as client:
         yield client
 
 
@@ -37,7 +37,7 @@ async def async_client() -> AsyncClient:
 @pytest.mark.asyncio
 async def test_create_and_read(async_client):
     #print(async_client)
-    response = async_client.post("/tasks", json={"title": "テストタスク"})
+    response = await async_client.post("/tasks", json={"title": "テストタスク"})
     assert response.status_code == starlette.status.HTTP_200_OK
     response_obj = response.json()
     assert response_obj["title"] == "テストタスク"

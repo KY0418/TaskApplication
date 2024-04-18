@@ -7,31 +7,31 @@ import api.models.task as task_model
 import api.schemas.task as task_schema
 from typing import List
 
+
 async def create_task(db:PostgresqlDatabase,task_create:
                 task_schema.TaskCreate) -> task_model.Task:
     #print(f"データベースオブジェクト: {db}")
-    task = task_model.Task(**task_create.dict())
+    task = task_model.Task(**task_create.model_dump())
     task.save()
-    print(task)
+    #print(task)
     return task
 
 async def get_tasks_with_done() -> List[task_model.Task]:
-    #aa = list[]
     print(task_model.Task.id)
     result = (task_model.Task
              .select(
                 task_model.Task.id,
                 task_model.Task.title,
-                task_model.Done.id 
+                task_model.Task.done,
             )
             .join(task_model.Done, on=(task_model.Task.id == task_model.Done.id),join_type=JOIN.LEFT_OUTER)
             #.objects(constructor=task_model.Task)
-            .where(task_model.Done.id.is_null() == False)
+            .group_by(task_model.Task.id)
     )
-    
     #result = list(result)
-    #print("test")
-    return [ (i.id,i.title) for i in result ]
+    #print(result,"9999")
+    #print( [ (i.id,i.title,i.done) for i in result ])
+    return [ (i.id,i.title,i.done) for i in result ]
 
 async def update_task(db:PostgresqlDatabase,task_create:task_schema.TaskCreate,
                         original:task_model.Task,task_id:int)-> task_model.Task:
@@ -45,7 +45,7 @@ async def update_task(db:PostgresqlDatabase,task_create:task_schema.TaskCreate,
 
 async def get_task(task_id:int) -> List[task_model.Task] | None:
     result = (task_model.Task.
-              select(task_model.Task).where(task_model.Task.id == task_id))
+              select(task_model.Task.title).where(task_model.Task.id == task_id))
     #result = ResultIterator(result)
     
     return [ (i.title) for i in result ]
