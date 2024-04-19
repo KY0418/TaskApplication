@@ -1,6 +1,5 @@
-from asyncpg import TransactionResolutionUnknownError
+
 from peewee import *
-from sqlalchemy import null
 
 from api.db import Base
 

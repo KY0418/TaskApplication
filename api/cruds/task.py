@@ -34,7 +34,6 @@ async def get_tasks_with_done() -> List[task_model.Task]:
 async def update_task(db:PostgresqlDatabase,task_create:task_schema.TaskCreate,
                         original:task_model.Task,task_id:int)-> task_model.Task:
     print(original)
-    title: str
     #task = task_model.Task()
     # task.title = original
     print(task_create)

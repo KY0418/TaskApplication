@@ -1,44 +1,45 @@
-from asyncio import Task
-from turtle import done
 from peewee import *
-from typing import List
-
 import api.models.task as task_model
 
-# async def get_done(db,task_id: int) -> task_model.Done | None:
-#     # result = (task_model.Task
-#     #           .select(task_model.Task.done)
-#     #           .where((task_model.Task.done == False) & (task_model.Task.id == task_id)))
-#     result = (task_model.Task
-#               .select(task_model.Task.done)
-#               .where((task_model.Task.id == task_id) & (task_model.Task.done == False)))   
-#     #result = task_model.Done.get(id = task_id)
-#     print(result)
-#     res = result.limit(1).get()
-#     #return [(i.done) for i in result]
-#     print(res)
-#     return res
-
-async def get_done(db,task_id: int) :
+async def get_done(task_id: int):
+    print(task_id)
     done = task_model.Done.get_or_none(task_model.Done.task_id == task_id) 
-    print(done.__dict__)
+    print(done)
+    if done is None: 
+        return None
     return done
 
 
-async def create_done(db: PostgresqlDatabase,task_id:int) -> List[task_model.Done]:
-    print(task_id)
-    done = task_model.Done()
-    done.task_id = task_id
-    print(done.task_id)
-    print(done.__dict__)
-    done.save()
-    res = task_model.Task.select().filter(task_model.Task.id == task_id)
-    print([ (i.title) for i in res])
-    #res = (task_model.Done.select(task_model.Done.id).where(task_model.Done.id == task_id))
-    return [done]
+async def create_done(id:int) -> task_model.Done:
+    done = task_model.Done.create(task_id = id)
+    
+    return done.task_id
 
-async def delete_done(db: PostgresqlDatabase,original:task_model.Done) -> None:
-    done = task_model.Done.get(id = original)
+async def delete_done(original:task_model.Done) -> None:
+    done = task_model.Done.get(task_model.Done.task_id == original)
+    print(done)
     done.delete_instance()
-    await done.save()
+
+async def FLtoTR(task_id:int) -> bool:
+    result = task_model.Task.get(task_model.Task.id == task_id)
+    print(result)
+    result.done = True
+    try:
+        result.save()
+    except:
+        return False
+    return True
+
+async def TRtoFL(task_id) -> bool:
+    result = task_model.Task.get(task_model.Task.id == task_id)
+    print(result)
+    result.done = False
+    try:
+        result.save()
+    except:
+        return False
+    return True
+
+
+
     
