@@ -12,8 +12,8 @@ router = APIRouter()
 
 @router.put("/tasks/{task_id}/done", response_model=List[done_schema.DoneResponse])
 async def mark_task_as_done(task_id: int, db: PostgresqlDatabase=Depends(get_db)):
-    print(task_id)
-    done = await done_crud.get_done(db,task_id=task_id)
+    print("aaaaaaaaaaaa")
+    done = done_crud.get_done(db,task_id=task_id)
     #done = None
     print(done)
     if done is not None:

@@ -20,16 +20,22 @@ import api.models.task as task_model
 #     return res
 
 async def get_done(db,task_id: int) :
-    done = task_model.Done.get_or_none(task_model.Done.id == task_id) 
-    print(done)
+    done = task_model.Done.get_or_none(task_model.Done.task_id == task_id) 
+    print(done.__dict__)
     return done
 
 
 async def create_done(db: PostgresqlDatabase,task_id:int) -> List[task_model.Done]:
-    done = task_model.Done(task_id)
+    print(task_id)
+    done = task_model.Done()
+    done.task_id = task_id
+    print(done.task_id)
+    print(done.__dict__)
     done.save()
+    res = task_model.Task.select().filter(task_model.Task.id == task_id)
+    print([ (i.title) for i in res])
     #res = (task_model.Done.select(task_model.Done.id).where(task_model.Done.id == task_id))
-    return [done] 
+    return [done]
 
 async def delete_done(db: PostgresqlDatabase,original:task_model.Done) -> None:
     done = task_model.Done.get(id = original)
