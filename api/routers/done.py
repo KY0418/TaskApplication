@@ -2,9 +2,9 @@ from tkinter import NO
 from typing import List
 from fastapi import APIRouter, HTTPException, Depends
 from peewee import *
-from api.db import get_db
-import api.schemas.done as done_schema
-import api.cruds.done as done_crud
+from db import get_db
+import schemas.done as done_schema
+import cruds.done as done_crud
 
 
 router = APIRouter()

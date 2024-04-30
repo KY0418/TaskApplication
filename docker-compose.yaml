@@ -2,7 +2,9 @@ version: '3'
 services:
   api:
     container_name: taskapi_re
-    build: .
+    build:
+      context: .
+      dockerfile: ./api/Dockerfile
     volumes:
       - .dockerenv:/src/.venv
       - .:/src
@@ -25,8 +27,24 @@ services:
       - postgres_data:/var/lib/postgres
     ports:
       - 5432:5432
+
+  web:
+    container_name: front
+    build:
+      context: .
+      dockerfile: ./web/Dockerfile
+    volumes:
+    - .frontend:/src/.venv
+    ports: 
+    - 3000:3000
+    environment: 
+      TZ: Asia/Tokyo
+    tty: true
+
 volumes:
   dockerenv:
     driver: local
   postgres_data:
+    driver: local
+  frontend:
     driver: local

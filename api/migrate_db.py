@@ -1,6 +1,6 @@
 from tkinter import CASCADE
 from peewee import *
-from api.models.task import Task,Done
+from models.task import Task,Done
 
 #from api.models.task import BaseModel
 

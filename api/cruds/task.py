@@ -2,8 +2,8 @@ from asyncio import Task
 from copyreg import constructor
 from tokenize import String
 from peewee import *
-import api.models.task as task_model
-import api.schemas.task as task_schema
+import models.task as task_model
+import schemas.task as task_schema
 from typing import List
 
 

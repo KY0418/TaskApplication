@@ -1,6 +1,6 @@
 from fastapi import FastAPI 
 from peewee import *
-from api.routers import task,done
+from routers import task,done
 
 import logging
 

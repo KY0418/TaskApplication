@@ -1,5 +1,5 @@
 from peewee import *
-import api.models.task as task_model
+import models.task as task_model
 
 async def get_done(task_id: int):
     print(task_id)

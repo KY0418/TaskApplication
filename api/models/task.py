@@ -1,13 +1,17 @@
 
+from email.policy import default
 from peewee import *
+import datetime
 
-from api.db import Base
+from sqlalchemy import null
+from db import Base
 
 class Task(Base):
    
     id = AutoField(primary_key=True)
     title = CharField(max_length=1024)
-
+    due_date = DateField(formats=['%Y-%m-%d'])#formats指定しないとリクエストボディの値を参照しない
+                                              #その場合、defaultまたは、null=Trueを設定しなければならない（not null Errorが起きる）
     done = BooleanField(default=False, column_name="done")
     class Meta:
         table_name = "tasks"
