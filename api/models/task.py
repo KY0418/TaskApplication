@@ -2,8 +2,6 @@
 from email.policy import default
 from peewee import *
 import datetime
-
-from sqlalchemy import null
 from db import Base
 
 class Task(Base):

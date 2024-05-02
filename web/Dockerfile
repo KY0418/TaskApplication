@@ -1,9 +1,18 @@
 FROM node:18.20.2
 
-WORKDIR /src/web/vue-task
+WORKDIR /app
 
-# RUN npm init
-RUN  npm install -g npm
-RUN npm install -g vue-cli
+# RUN npm init -y
+# RUN npm install -g npm
+# RUN apt-get update -qq && npm install -g vue-cli
 
-ENTRYPOINT ["npm","run","dev"]
+# COPY .. :
+
+# ENTRYPOINT ["npm", "run", "dev"]
+
+RUN apt-get update -qq && yarn global add @vue/cli
+
+
+COPY .. :
+RUN yarn
+CMD ["yarn", "dev", "--port", "3000"]

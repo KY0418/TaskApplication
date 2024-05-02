@@ -1,7 +1,10 @@
-import './assets/main.css'
-
+import './assets/reset.css'
+import 'uno.css' 
+import '@unocss/preset-uno'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+
+
 
 import App from './App.vue'
 import router from './router'

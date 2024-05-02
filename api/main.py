@@ -1,5 +1,5 @@
 from fastapi import FastAPI 
-from peewee import *
+# from peewee import *
 from routers import task,done
 
 import logging

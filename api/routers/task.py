@@ -1,12 +1,10 @@
-from re import I, L
 from fastapi import APIRouter,Depends,HTTPException
-from peewee import *
-from api import test
 import schemas.task as task_schema
 import cruds.task as task_crud
 import models.task as task_model
 from typing import List
 from db import get_db
+from peewee import PostgresqlDatabase
 
 db = PostgresqlDatabase("task_data",user="kaneko",password="goldsilver",host="postgresql",port=5432,autoconnect=True)
 

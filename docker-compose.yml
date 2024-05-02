@@ -1,10 +1,10 @@
-version: '3'
+
 services:
   api:
     container_name: taskapi_re
     build:
-      context: .
-      dockerfile: ./api/Dockerfile
+      context: ./api
+      # dockerfile: ./api/Dockerfile
     volumes:
       - .dockerenv:/src/.venv
       - .:/src
@@ -34,11 +34,12 @@ services:
       context: .
       dockerfile: ./web/Dockerfile
     volumes:
-    - .frontend:/src/.venv
-    ports: 
-    - 3000:3000
-    environment: 
-      TZ: Asia/Tokyo
+      - ./web:/app
+      # - dev-vol:/web/task-vue
+    ports:
+      - 3000:3000
+    environment:
+      - NODE_ENV=development
     tty: true
 
 volumes:
