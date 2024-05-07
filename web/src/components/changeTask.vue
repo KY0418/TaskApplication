@@ -1,6 +1,6 @@
 <template lang="pug">
 div.border-solid.rounded-20px.border-gray.w-100.whole
-    p.border-solid.rounded-20px.border-color-white.text-white.title タスクを編集
+    p.border-solid.rounded-20px.border-color-white.text-white.text-center.bg-#0000FF タスクを編集
     div.mt-5.tabContent
         p.pr-28 タスクタイトル
         input(type="text" name="title").mt-2
@@ -16,10 +16,10 @@ div.border-solid.rounded-20px.border-gray.w-100.whole
 
 </template>
 <style lang="scss" scoped>
-.title {
-    text-align: center;
-    background-color:#0000FF  
-}
+// .title {
+//     text-align: center;
+//     background-color:#0000FF  
+// }
 .tabContent {
     text-align: center;
 }
