@@ -3,7 +3,7 @@ import datetime
 
 class TaskBase(BaseModel):
     title : str | None = Field(None,json_schema_extra="クリーニングを取りに行く")
-    due_date: datetime.date | None = Field(None,json_schema_extra="2024-12-01")
+    due_date: datetime.date | str | None  = Field(None,json_schema_extra="2024-12-01")
 
 class TaskCreate(TaskBase):
     pass

@@ -13,7 +13,7 @@ const routeSettings :RouteRecordRaw[] = [
     path:'/TaskAdd',
     name:"taskadd",
     component:TaskAdd
-  }
+  },
 ]
 
 const router = createRouter({

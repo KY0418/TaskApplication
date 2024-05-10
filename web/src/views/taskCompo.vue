@@ -1,113 +1,123 @@
 <script setup lang="ts">
-const title = "unko"
-const status = "unko"
-const id = 1
-const mainId = 1
-const mainTitle = "タスクタイトル"
-let show = false
-interface Props {
-  show : boolean,
-  count: number,
+import axios, { Axios, type AxiosResponse } from 'axios'
+import { ref,reactive,computed, onMounted } from 'vue';
+import type { responseData,eventFLG,defData} from '@/interfaces'
+import popup from "../components/popup.vue"
+import taskContent from "../components/taskContent.vue"
+
+// 検索対象のタイトル
+const tasktitle = ref("")
+const status = ref("")
+// 新規タスクタイトル
+const mainTitle = ref("タスクタイトル")
+let show = ref(false)
+// getで取得したIDを格納する　非同期関数内でreturnした値を使うとundefinedになる
+let gid: number;
+let recid: number;
+let globalTitle: string
+
+const defData = reactive ({
+  title: ref(''),
+  due_date: "2024-05-10",
+  done: false
+})
+
+let apiUrl = 'http://localhost:8000/tasks/'
+let apiUrlt = 'http://localhost:8000'
+
+const initializeGettitle = async (): Promise<void> => {
+  const response = await axios.get(apiUrl,{
+    })
+  const obj = response.data[0]
+  console.log(obj.title)
+  tasktitle.value = obj.title
 }
 
-const showPopup = () : boolean =>{
-  show = !show
-  console.log(show)
-  return show
+
+
+// 後で戻り値をvoidにする
+const getId = async (title:string): Promise<number> => {
+  let retId : number = 0;
+  try {
+    const response = await axios.get<responseData>(apiUrl,{
+    })
+   
+    const record = Array.prototype.filter.call(response.data,user => {
+      return user.title === title
+    }) 
+    const extractedParameters:{id:number}[] = []
+    record.forEach(obj => {
+      extractedParameters.push({
+        id: obj.id,
+      });
+    });
+    const id = extractedParameters.map(param => param.id)
+    retId = id[0]
+    gid = id[0]
+    recid = gid
+    console.log(typeof(retId))
+  }catch(error){
+    console.error('Failed to get users:', error);
+  } 
+  return retId
+};
+
+const delt = async (): Promise<void> => {
+  const id = await getId(tasktitle.value).then(id => {
+    console.log('Idaaaa:',id,typeof(id))
+    })
+  apiUrl = `${apiUrlt}/tasks/${gid}`
+  console.log(apiUrl)
+  const response = await axios.delete(apiUrl)
+  .then(response =>{
+    console.log("deleteが成功しました")
+  })
+  .catch(error => {
+    console.error("Failrd to delete error:",error)
+  })
 }
+
+const changeTitle = (newTitle:string): void => {
+  console.log(newTitle)
+  tasktitle.value = newTitle
+}
+
+const changeStatus = (newstatus: string) : void => {
+  if(status.value == newstatus && newstatus != null){
+    console.log("no change")
+  }else if(newstatus == "未着手"){
+    newstatus = "完了"
+  }else{
+    newstatus = "未着手"
+  }
+
+}
+
+const changeSwitch = (): void => {
+  show.value = !show.value
+}
+onMounted(() => {
+        initializeGettitle()
+    })
 </script>
 
 <template lang="pug">
-div.popup-bg-cover
-  div.border-solid.border-red.rounded-25px.m-4.w-70.taskBox
-    table
-      thead 
-        tr
-          th.block.text-red.mt-2.ml-2  {{mainTitle}} {{ mainId }}
-      tbody.block.border-solid.border-white.rounded-20px.bg-white.m-3.p-3.w-auto
-          tr
-            td.block.border-solid.border-white.rounded-8px.bg-blue.text-white.p-1.w-8.text-xs {{ status }}
-          tr 
-            td.block.mt-2.mb-2 {{ title }}{{ id }}
-          tr
-            td
-              button(@click="showPopup").block.float-left.border-solid.border-white.rounded-5px.text-white.bg-green.text-sm.ml-28.p-1 編集
-              a(href="#",style="text-decoration: none").block.float-right.border-solid.border-white.rounded-5px.text-white.bg-red.text-sm.ml-4.mr-4.p-1 削除
+div.border-solid.border-red.rounded-25px.m-4.w-70.taskBox
+    p.text-red.mt-2.ml-2 {{ mainTitle }}
+    div.taskCont
+      taskContent(v-bind:popupstatus="show" v-bind:title="tasktitle" v-bind:status="status" v-on:createTitle="changeTitle" v-on:changeState="changeStatus" v-on:changePopupStatus="changeSwitch" )
+      button(type="button" @click="initializeGettitle") aaa
+      pre {{ tasktitle }}
+div(v-if="show")
+  popup( v-bind:title="tasktitle" v-bind:popstatus="show" v-on:changetitle="changeTitle" v-on:changeSwitch="changeSwitch")                      
             
-          
-div.sample-popup-window
-label テスト
-  input(type="checkbox" id="sample-popup-switch")
-  div.sample-popup-background
-    div.sample-popup-box
-      div.border-solid.border-0.border-white.rounded-20px.ml-a.sample-popup-content
-        div.boxcomp
-          h2.text-white.text-2xl.bg-blue.text-center.poptitle タスクを編集
-          label.block.mt-4.ml-4 タスクタイトル
-            div.mt-4.ml-10
-              input(type="text").w-60
-          label.block.mt-4.ml-4.mr-4 ステータス
-            div.mt-4.ml-12
-              input(type="radio").float-left
-              span 未着手
-              input(type="radio").ml-5
-              span 完了
-          label.block
-            div.mt-4.ml-17
-              button(type="button").border-solid.border-white.rounded-5px.bg-blue 更新
-              button(type="button").border-solid.border-white.rounded-5px.bg-red.ml-8 キャンセル
-        //- label(for="sample-popup-switch").sample-popup-close 閉じる
 </template>
-
-<style lang="scss">
-sample-popup-switch {
-	/* チェックボックスを非表示 */
-	display: none;
+<style lang="scss" scoped>
+input {
+  border: none;
+  outline: none;
 }
-.sample-popup-background {
-	/* 画面全体を暗くする透過背景 */
-	position: fixed;
-	width: 100%;
-	height: 100%;
-	background: rgba(0,0,0,.5);
-	top: 0;
-	left: 0;
-	z-index: 1000;
+.taskCont {
+  margin:auto;
 }
-.sample-popup-content {
-	/* ポップアップ本体 */
-	display: inline-block;
-	position: fixed;
-	width: 50%;
-	z-index: 1100;
-	background: #fff;
-	// padding: 2%;
-  height:55%;
-  width: 40%;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%,-50%);
-}
-.sample-popup-close {
-	/* ポップアップ内の閉じるボタン */
-	position: relative;
-	display: inline-block;
-	background: #09f;
-	color: #fff;
-	padding: 0 1em;
-	border-radius: 3px;
-	cursor: pointer;
-	left: 50%;
-	transform: translateX(-50%);
-}
-#sample-popup-switch:checked ~ .sample-popup-background, #sample-popup-switch:checked ~ .sample-popup-box {
-	/* ポップアップ･透過背景を閉じる */
-	display: none;
-}
-.poptitle {
-  border: 1px solid #ffffff;
-  border-top-left-radius: 20px; /* 上左コーナーの半径を設定 */
-  border-top-right-radius: 20px; /* 上右コーナーの半径を設定 */
-}
-
 </style>

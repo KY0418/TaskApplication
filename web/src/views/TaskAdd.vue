@@ -20,8 +20,12 @@ router-link(:to="{name:'apphome'}") ホーム画面へ
 </template>
 
 <style lang="scss" scoped>
-.te {
+#postdata{
   border: none;
+}
+#postdata:focus {
+  outline: none;
+
 }
 
 .tr1 {
@@ -37,6 +41,11 @@ button{
 <script setup lang="ts">
 import axios from 'axios'
 import { ref,reactive} from 'vue';
+import { useRouter } from 'vue-router';
+import type {defData,Emits} from '../interfaces'
+
+const router = useRouter()
+let eveflg = false
 
 const TrueOrFalse = ref(0)
 const defData = reactive ({
@@ -45,29 +54,45 @@ const defData = reactive ({
   done: false
 })
 
+
+
 const apiUrl = 'http://localhost:8000/tasks';
 
 const post = async () : Promise<any> => {
+  
   if (TrueOrFalse.value == 2){
     defData.done = true
   }else {
     defData.done = false
   }
   console.log(defData.done)
-  axios.post(apiUrl, defData)
+  await axios.post(apiUrl, defData)
   .then(response => {
     if (response.status === 200 || response.status === 201) {
-      console.log('POSTリクエストが成功しました！');
+      eveflg = true
+      console.log(eveflg)
+      console.log('POSTリクエストが成功しました');
       console.log('レスポンスデータ:', response.data);
     } else {
       console.error('POSTリクエストが失敗しました:', response.status, response.data);
     }
   })
   .catch(error => {
+    eveflg = false
     console.error('POSTリクエスト中にエラーが発生しました:', error);
-  });
+  })
+  
+  succeedAddTask(eveflg)
 }
 const InputTitle = (): void => {
   console.log(defData.title)
 }
+
+function succeedAddTask(flg: boolean): void  {
+  if(flg == true){
+    console.log("aaaaaa")
+    router.push({name:"apphome"})
+  }
+}
+
 </script>

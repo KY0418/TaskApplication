@@ -4,13 +4,13 @@ import {computed} from "vue"
 import { useCounterStore } from "@/stores/counter";
 import taskCompo from "./taskCompo.vue"
 
+
+
 </script>
 
 <template lang="pug">
 div 
-    |
     router-link(:to="{name:'taskadd'}" style="text-decoration: none").ml-2.mt-4.taskAddbox ＋タスクを追加
-    |
     taskCompo
 </template>
 <style lang="scss">
@@ -23,6 +23,7 @@ div
   border-radius: 5px;
   border: white 1px;
   background-color: blue;
+  min-width: 15%;
 }
 </style>
 

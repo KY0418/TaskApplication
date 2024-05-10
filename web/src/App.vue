@@ -1,46 +1,3 @@
-<script setup lang="ts">
-import { RouterView } from 'vue-router'
-import changeTask from './components/changeTask.vue'
-import axios from 'axios';
-// import { taskApp } from './interfaces';
-const title = "aaaaaaa"
-
-// defineProps<taskApp>();
-
-const apiUrl = 'http://localhost:8000/tasks';
-
-const test = async (): Promise<any> => {
-  try {
-    const response = await axios.get<any>(apiUrl); // 型を指定
-    const data = response.data;
-    console.log(data); // データを処理して使用する
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-const pdata = {
-  title:"いいいいいい",
-}
-const ptest = async () : Promise<any> => {
-   axios.post(apiUrl, pdata)
-  .then(response => {
-    if (response.status === 200 || response.status === 201) {
-      console.log('POSTリクエストが成功しました！');
-      console.log('レスポンスデータ:', response.data);
-    } else {
-      console.error('POSTリクエストが失敗しました:', response.status, response.data);
-    }
-  })
-  .catch(error => {
-    console.error('POSTリクエスト中にエラーが発生しました:', error);
-  });
-interface APIResponse {
-  title: string,
-}
-}
-</script>
-
 <template lang="pug">
 div.bod
     div.boxtitle
@@ -79,3 +36,46 @@ h1 {
 
 
 </style>
+<script setup lang="ts">
+import { RouterView } from 'vue-router'
+import changeTask from './components/changeTask.vue'
+import axios from 'axios';
+// import { taskApp } from './interfaces';
+
+const title = "aaaaaaa"
+
+// defineProps<taskApp>();
+
+const apiUrl = 'http://localhost:8000/tasks';
+
+const test = async (): Promise<any> => {
+  try {
+    const response = await axios.get<any>(apiUrl); // 型を指定
+    const data = response.data;
+    console.log(data); // データを処理して使用する
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const pdata = {
+  title:"いいいいいい",
+}
+const ptest = async () : Promise<any> => {
+   axios.post(apiUrl, pdata)
+  .then(response => {
+    if (response.status === 200 || response.status === 201) {
+      console.log('POSTリクエストが成功しました！');
+      console.log('レスポンスデータ:', response.data);
+    } else {
+      console.error('POSTリクエストが失敗しました:', response.status, response.data);
+    }
+  })
+  .catch(error => {
+    console.error('POSTリクエスト中にエラーが発生しました:', error);
+  });
+interface APIResponse {
+  title: string,
+}
+}
+</script>
