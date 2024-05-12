@@ -1,13 +1,17 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker,declarative_base
 
-DB_URL = "mysql+pymysql://root@db:3306/demo?charset=utf8"
+from peewee import *
 
-db_engine = create_engine(DB_URL,echo=True)
-db_session = sessionmaker(autocommit=False,autoflush=False,bind=db_engine)
+#DB_URL = "mysql+pymysql://root@db:3306/demo?charset=utf8"
 
-Base = declarative_base()
+db = PostgresqlDatabase("task_data",user="kaneko",password="goldsilver",port=5432,host="postgresql")
+
+class Base(Model):
+   class Meta:
+      database = db
 
 def get_db():
-    with db_session() as session:
-        yield session
+   try:
+      db.connect()
+      yield
+   finally:
+      db.close()
