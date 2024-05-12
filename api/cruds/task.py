@@ -40,6 +40,7 @@ async def update_task(db:PostgresqlDatabase,task_create:task_schema.TaskCreate,
     task = task_model.Task.get(task_model.Task.id == task_id)
     print("33333",task)
     task.title = task_create.title
+    task.done = task_create.done
     print("33333",task.title)
     #task_model.Task.update(title = task_create).where(task_model.Task.id == task_id)
     task.save()

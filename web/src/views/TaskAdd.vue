@@ -8,21 +8,20 @@ p.mt-5.ml-5.text-xl タスク追加
                 input(type="text" name="sample" id="postdata" v-model="defData.title").ml-8.w-93.te
         tr
           td.pt-2.pb-2.pl-2
-            label(for="radioGroup") ステータス：
-              input(type="radio" id="radioGroup" v-model="TrueOrFalse" value="1").ml-35
+            label ステータス：
+              input(type="radio"  v-model="TrueOrFalse" value="false" checked).ml-35
               span.mr-2 未着手
-              input(type="radio" id="radioGroup" v-model="TrueOrFalse" value="2" )
+              input(type="radio" v-model="TrueOrFalse" value="true" )
               span 完了
 div.ml-120
-    button(type="button" @click="post").border-solid.rounded-15px.border-white.text-white.p-1 タスク追加
-    
-router-link(:to="{name:'apphome'}") ホーム画面へ   
+    button(type="button" @click="post").border-solid.rounded-15px.border-white.text-white.p-1 タスク追加   
 </template>
 
 <style lang="scss" scoped>
 #postdata{
   border: none;
 }
+
 #postdata:focus {
   outline: none;
 
@@ -36,63 +35,119 @@ router-link(:to="{name:'apphome'}") ホーム画面へ
 button{
   background-color: #0000FF;
 }
+
+.te:focus {
+  background-color: white;
+}
 </style>
 
 <script setup lang="ts">
 import axios from 'axios'
 import { ref,reactive} from 'vue';
+import ToastPlugin from 'vue-toast-notification';
 import { useRouter } from 'vue-router';
-import type {defData,Emits} from '../interfaces'
+import { useToast } from 'vue-toast-notification';
 
+const toast = useToast()
+
+interface Emits {
+  (event:"toastFlg",msg:string):void
+}
+
+const emit = defineEmits<Emits>()
+
+// Propsデータを受け取るためのinterface
+interface defData {
+  responseData: {
+    title: string
+    due_date: string
+    id: number
+    done: boolean
+  }[]
+}
+
+const props = defineProps<defData>()
+
+const tList = ref([""])
+
+// トーストのメッセージ
+const tsMsg = ref("")
+
+// Routerのインスタンス
 const router = useRouter()
+
+// PUT成功・失敗フラグ
 let eveflg = false
 
-const TrueOrFalse = ref(0)
-const defData = reactive ({
-  title: ref(''),
-  due_date: "2024-05-07",
-  done: false
-})
+// taskのステータス（ステータスが3個以上になったときのために数字で分別）
+const TrueOrFalse = ref(false)
 
+// タスクのステータス
+const taskStatus = ref(false)
 
-
+// リクエスト先のURL
 const apiUrl = 'http://localhost:8000/tasks';
 
+// POSTデータ
+const defData = reactive ({
+  title: ref(''),
+  due_date: "2024-05-13",
+  done:TrueOrFalse.value
+})
+
+// POST成功時にタスク一覧画面に遷移する　失敗時はERRORトーストを表示
+function succeedAddTask(flg: boolean): void  {
+  if(flg == true){
+    tsMsg.value = "登録完了"
+    router.push({name:"apphome"})
+    emit("toastFlg",tsMsg.value)
+  }
+}
+
+const getData = async () : Promise<void> => {
+  const titleList = props.responseData
+  for(const title of titleList){
+    tList.value.push(title.title)
+    tList.value = tList.value.filter((title) => title !== "")
+    console.log(title.title)
+  }
+  console.log(tList.value)
+}
+
+// POST関数
 const post = async () : Promise<any> => {
-  
-  if (TrueOrFalse.value == 2){
+  getData()
+  eveflg = tList.value.includes(defData.title)
+  eveflg = defData.title === "" ? true : false
+  console.log(eveflg)
+  console.log(TrueOrFalse.value)
+  if (TrueOrFalse.value == true){
     defData.done = true
   }else {
     defData.done = false
   }
-  console.log(defData.done)
-  await axios.post(apiUrl, defData)
-  .then(response => {
-    if (response.status === 200 || response.status === 201) {
-      eveflg = true
-      console.log(eveflg)
-      console.log('POSTリクエストが成功しました');
-      console.log('レスポンスデータ:', response.data);
-    } else {
-      console.error('POSTリクエストが失敗しました:', response.status, response.data);
-    }
-  })
-  .catch(error => {
-    eveflg = false
-    console.error('POSTリクエスト中にエラーが発生しました:', error);
-  })
-  
-  succeedAddTask(eveflg)
-}
-const InputTitle = (): void => {
-  console.log(defData.title)
-}
-
-function succeedAddTask(flg: boolean): void  {
-  if(flg == true){
-    console.log("aaaaaa")
-    router.push({name:"apphome"})
+if (eveflg == false){
+    await axios.post(apiUrl, {
+      title:defData.title,
+      due_date:"2024-05-13",
+      done:TrueOrFalse.value,
+    })
+    .then(response => {
+      if (response.status === 200 || response.status === 201) {
+        console.log('POSTリクエストが成功しました');
+        console.log('レスポンスデータ:', response.data);
+      } else {
+        console.error('POSTリクエストが失敗しました:', response.status, response.data);
+      }
+    })
+    .catch(error => {
+      console.error('POSTリクエスト中にエラーが発生しました:', error);
+    })
+    succeedAddTask(eveflg)
+  }else if(eveflg == true) {
+    toast.error("そのタスクは既に存在しているか、タイトルが空になっています",{
+      position:"top"
+    })
   }
 }
-
 </script>
