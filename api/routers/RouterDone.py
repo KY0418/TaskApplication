@@ -1,10 +1,9 @@
-from tkinter import NO
 from typing import List
 from fastapi import APIRouter, HTTPException, Depends
-from peewee import *
+from peewee import PostgresqlDatabase
 from db import get_db
-import schemas.done as done_schema
-import cruds.done as done_crud
+import api.modules.done.SchemaDone as done_schema
+import api.modules.done.ServiceDone as done_crud
 
 
 router = APIRouter()

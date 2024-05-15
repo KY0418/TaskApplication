@@ -7,17 +7,17 @@ div.sample-popup-window
           h2.text-white.text-2xl.bg-blue.text-center.poptitle タスクを編集
           label.block.mt-4.ml-4 タスクタイトル
             div.mt-4.ml-10
-              input(type="text" v-model="newtitle" :placeholder="props.title").w-60.tt
+              input(type="text" v-model="newtitle" ).w-60.tt
           label.block.mt-8.ml-4.mr-4.mb-4 ステータス
             div.mt-4.ml-12.rd
-              input(type="radio" v-model="TrueOrFalse" value="false" checked).float-left
+              input(type="radio" v-model="TrueOrFalse" :value="false").float-left
               span 未着手
-              input(type="radio" v-model="TrueOrFalse" value="true").ml-5
+              input(type="radio" v-model="TrueOrFalse" :value="true").ml-5
               span 完了
           label.block
             div.mt-4.ml-17.rd
               button(type="button" @click="put").border-solid.border-white.rounded-5px.bg-blue 更新
-              button(type="button" @click="popupClose").border-solid.border-white.rounded-5px.bg-red.ml-8.float-right.sample-popup-close  キャンセル
+              button(type="button" @click="popupClose").border-solid.border-white.rounded-5px.bg-red.ml-8.float-right  キャンセル
 </template>
 
 <style lang="scss" scoped>
@@ -46,19 +46,6 @@ div.sample-popup-window
 	transform: translate(-50%,-50%);
   min-width: 30%;
 }
-.sample-popup-close {
-	/* ポップアップ内の閉じるボタン */
-	position: relative;
-	background: rgb(255, 0, 0);
-	padding: 0 1em;
-	border-radius: 3px;
-	cursor: pointer;
-
-}
-#sample-popup-switch:checked ~ .sample-popup-background, #sample-popup-switch:checked ~ .sample-popup-box {
-	/* ポップアップ･透過背景を閉じる */
-	display: none;
-}
 
 .poptitle {
   border: 1px solid #ffffff;
@@ -76,31 +63,30 @@ div.sample-popup-window
 
 <script setup lang="ts">
 import axios from 'axios'
-import { ref,reactive } from 'vue';
+import { ref,reactive, computed, watch } from 'vue';
 import type { responseData,eventFLG} from '@/interfaces'
 import { useToast } from 'vue-toast-notification';
 
 interface defData {
     title:string,
     status:boolean,
-    popstatus:boolean,
     id: number
 }
 
 const props = defineProps<defData>()
-
-const TrueOrFalse = ref(false)
+const TrueOrFalse = ref(props.status)
+let newtitle = ref(props.title)
 const title  = ref(props.title)
-const showSwitch = ref(props.popstatus)
 const toast = useToast()
+let tasknum : number
 
 interface Emits {
 	(event:"changetitle",title:string):void
-	(event:"changeSwitch",showSwitch:boolean):void
-	(event:"showtoast",msg:string):void
-
+	(event:"changeSwitch"):void
+	(event:"showtoast",msg:string,flg:number):void
+	(event:"taskstatus",status:string):void
 }
-const newtitle = ref("")
+
 const emit = defineEmits<Emits>()
 // getで取得したIDを格納する　非同期関数内でreturnした値を使うとundefinedになる
 let gid: number;
@@ -108,7 +94,8 @@ let recid: number;
 const tsMsg = ref("")
 let apiUrl = 'http://localhost:8000/tasks/'
 const tList = ref([""])
-
+const taskState = ref("")
+let tFlg:number
 const defData = reactive ({
   due_date: "2024-05-13",
   done: false,
@@ -125,55 +112,56 @@ const changeStatus = (status: boolean): string => {
   return retStr
 }
 
-const getData = async () : Promise<void> => {
-  const response = await axios.get(apiUrl)
-  const titleList = response.data
-  for(const title of titleList){
-    tList.value.push(title.title)
-    tList.value = tList.value.filter((title) => title !== props.title && title !== "")
-    console.log(title.title)
-    console.log(tList.value)
-  }
-}
+watch(TrueOrFalse,(newvalue) => {
+    if(newvalue){
+      taskState.value = '完了'
+    }else {
+      taskState.value = "未着手"
+    }
+  })
 
 const put = async () : Promise<void> => {
-  await getData()
-  let flg = tList.value.includes(newtitle.value)
-  apiUrl = `${apiUrl}${props.id}`
-  console.log(apiUrl)
-  console.log(props.id)
-  console.log(tList.value)
-  if(flg == true){
-    toast.error("そのタスクは既に存在しています" ,{
-      position:"top"
-    })
-  }else if(flg == false){
-    if(newtitle.value == ""){
-      newtitle.value = props.title
-    }
-    console.log(TrueOrFalse.value)
-    const response = await axios.put( apiUrl,{
-      title: newtitle.value,
-      due_date: "2024-05-13",
-      done:TrueOrFalse.value,
-    })
-    .then(response => {
-      console.log("PUTが成功しました")
-      tsMsg.value = "更新完了"
-    })
-    .catch(error => {
-      console.error("Failed to update error:",error)
-      tsMsg.value = "更新失敗"
-    })
-    console.log(props.title)
-    emit("changetitle",newtitle.value)
-    emit("changeSwitch",props.popstatus)
-    emit("showtoast",tsMsg.value)
-  }
+console.log("111",newtitle.value == props.title && TrueOrFalse.value == props.status)
+// await getData()
+if(newtitle.value == props.title && TrueOrFalse.value == props.status){
+  // toast.error("そのタスクは既に存在しています" ,{
+  //   position:"top"
+  // })
+  const a = 0
 }
+console.log("search ",apiUrl.includes(String(props.id)))
+if(apiUrl.includes(String(props.id)) === false){
+  apiUrl = `${apiUrl}${props.id}`
+}
+console.log(apiUrl,"  URL TEST",props.id,"  task NUMBER")
+console.log(newtitle.value,TrueOrFalse.value)
+const response = await axios.put( apiUrl,{
+    title: newtitle.value,
+    due_date: "2024-05-13",
+    done:TrueOrFalse.value,
+  })
+  .then(response => {
+    console.log("PUTが成功しました")
+    tsMsg.value = "更新完了"
+    tFlg = 0
+    emit("changetitle",newtitle.value)
+    emit("changeSwitch")
+    emit("taskstatus",taskState.value)
+  })
+  .catch(error => {
+    tFlg = 1
+    console.log("Failed to update error:",error.response.data.detail)
+    tsMsg.value = error.response.data.detail
+    toast.error(tsMsg.value ,{
+    position:"top"
+  })
+  })
+  
+  emit("showtoast",tsMsg.value,tFlg)
+  }
 
 const popupClose = (): void => {
-	emit("changeSwitch",props.popstatus)	
+	emit("changeSwitch")	
 }
 </script>
 
