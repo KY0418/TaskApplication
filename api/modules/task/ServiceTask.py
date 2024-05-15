@@ -1,6 +1,6 @@
 from peewee import PostgresqlDatabase,DoesNotExist,JOIN
-import api.modules.task.ModelsTask as task_model
-import api.modules.task.SchemaTask as task_schema
+import modules.task.ModelsTask as task_model
+import modules.task.SchemaTask as task_schema
 from typing import List
 
 

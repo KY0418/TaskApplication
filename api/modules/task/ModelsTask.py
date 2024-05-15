@@ -1,6 +1,6 @@
 from email.policy import default
 from enum import unique
-from peewee import *
+from peewee import AutoField,CharField,BooleanField,ForeignKeyField,DateField
 from db import Base
 
 class Task(Base):

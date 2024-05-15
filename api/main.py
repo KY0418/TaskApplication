@@ -1,6 +1,6 @@
 from fastapi import FastAPI 
-from api.modules.task import RouterTask
-from api.modules.done import RouterDone
+from modules.task import RouterTask
+from modules.done import RouterDone
 from fastapi.middleware.cors import CORSMiddleware
 
 import logging

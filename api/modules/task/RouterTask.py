@@ -1,8 +1,8 @@
 from fastapi import APIRouter,Depends,HTTPException
 from pydantic import Json
-import api.modules.task.SchemaTask as task_schema
-import api.modules.task.ServiceTask as task_crud
-import api.modules.task.ModelsTask as task_model
+import modules.task.SchemaTask as task_schema
+import modules.task.ServiceTask as task_crud
+import modules.task.ModelsTask as task_model
 from db import get_db
 from peewee import PostgresqlDatabase
 import config

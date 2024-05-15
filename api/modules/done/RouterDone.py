@@ -2,8 +2,8 @@ from typing import List
 from fastapi import APIRouter, HTTPException, Depends
 from peewee import PostgresqlDatabase
 from db import get_db
-import api.modules.done.SchemaDone as done_schema
-import api.modules.done.ServiceDone as done_crud
+import modules.done.SchemaDone as done_schema
+import modules.done.ServiceDone as done_crud
 
 
 router = APIRouter()
