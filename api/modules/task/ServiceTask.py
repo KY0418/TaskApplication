@@ -1,8 +1,6 @@
-from asyncio import Task
-from copyreg import constructor
-from peewee import *
-import models.task as task_model
-import schemas.task as task_schema
+from peewee import PostgresqlDatabase,DoesNotExist,JOIN
+import modules.task.ModelsTask as task_model
+import modules.task.SchemaTask as task_schema
 from typing import List
 
 
@@ -33,19 +31,12 @@ async def get_tasks_with_done() -> List[task_model.Task]:
 
 async def update_task(db:PostgresqlDatabase,task_create:task_schema.TaskCreate,
                         original:task_model.Task,task_id:int)-> task_model.Task:
-    print("11111")
-    #task = task_model.Task()
-    # task.title = original
-    print("2222")
     task = task_model.Task.get(task_model.Task.id == task_id)
-    print("33333",task)
     task.title = task_create.title
     task.done = task_create.done
-    print("33333",task.title)
     #task_model.Task.update(title = task_create).where(task_model.Task.id == task_id)
     task.save()
     #task = task_model.Task(title=original)
-    print("4444")
     return task.title
 
 async def get_task(task_id:int) -> List[task_model.Task] | None:

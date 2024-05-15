@@ -2,12 +2,10 @@
 div.border-solid.border-red.rounded-25px.m-4.w-70.taskBox
     input(type="text" v-model="mainTitle").text-red.mt-2.ml-2.tb 
     div.taskCont
-      taskContent(v-for="item in props.responseData" v-bind:popupstatus="show" v-bind:title="item.title" v-bind:status="item.done" v-bind:id="item.id"
-                  v-on:createTitle="changeTitle" v-on:changeState="changeStatus" v-on:changePopupStatus="changeSwitch" v-on:updateId="updateId" v-on:showtoast="showToast")
-div(v-show="show")
-  popup( v-bind:title="tasktitle" v-bind:popstatus="show" v-bind:id="searchId" v-bind:status="false"  
-        v-on:changetitle="changeTitle" v-on:changeSwitch="changeSwitch" v-on:showtoast="showToastPut")                      
-            
+      taskContent(v-for="item in props.responseData" v-bind:title="item.title" v-bind:status="item.done" v-bind:id="item.id"
+                  v-on:createTitle="changeTitle" v-on:changeState="changeStatus" v-on:changePopupStatus="changeSwitch" v-on:updateId="updateId" v-on:showtoast="showToast"
+                  v-on:handData="getUpdFlg" v-on:delFlg="delFlgSecond")
+
 </template>
 <style lang="scss" scoped >
 input {
@@ -24,16 +22,15 @@ input {
 
 </style>      
 <script setup lang="ts">
-import { ref } from 'vue';
-import popup from "../components/popup.vue"
-import taskContent from "../components/taskContent.vue"
+import { ref, watch } from 'vue';
+import taskContent from "../components/TaskContent.vue"
 import { useToast } from 'vue-toast-notification';
 
 // 検索対象のタイトル
 const tasktitle = ref("")
 // タスクのステータス
 const taskstatus = ref("") 
-const status = ref()
+const status = ref(false)
 // 新規タスクタイトル
 const mainTitle = ref("タスクタイトル")
 // レコードを検索するためのID
@@ -42,6 +39,8 @@ const searchId = ref(0)
 let show = ref(false)
 // トーストのインスタンス
 const toast = useToast()
+const updFlgSon = ref(false)
+const delFlgSon = ref(false)
 // Propsデータを受け取るためのinterface
 interface defData {
   responseData: {
@@ -51,6 +50,35 @@ interface defData {
     done: boolean
   }[]
 }
+
+interface Emits {
+  (event:"handFlg",flg:boolean):void
+  (event:"delFlgs",delflg:boolean):void
+}
+
+const emit = defineEmits<Emits>()
+
+const getUpdFlg = (flg:boolean): void => {
+  updFlgSon.value = flg
+  console.log("emit2 ",flg)
+}
+
+const value:string | null = window.localStorage.getItem('tflg')
+console.log(value)
+if(value === "success"){
+  toast.success("登録成功",{
+    position:"top"
+  })
+  window.localStorage.setItem('tflg','def')
+}
+
+watch(updFlgSon,() => {
+  emit("handFlg",updFlgSon.value)
+  console.log("emit2")
+  updFlgSon.value = false
+})
+
+const delshow = ref(false)
 
 // Props受け取りデータ格納変数
 const props = defineProps<defData>()
@@ -67,7 +95,6 @@ const changeTitle = (newTitle:string): void => {
 
 const changeStatus = (newstatus: boolean) : void => {
   status.value = newstatus
- 
 }
 
 const changeSwitch = (): void => {
@@ -79,16 +106,14 @@ const updateId = (newid: number): void => {
   console.log(searchId.value)
 }
 
-const showToast = (msg:string): void => {
-  if(msg === "削除完了"){
+const showToast = (msg:string,flg:number): void => {
+  if(flg == 0){
     toast.success(msg,{
-      position:"top",
-      pauseOnHover:false
+      position:"top"
     })
-  }else if(msg === "削除失敗"){
+  }else if(flg == 1){
     toast.error(msg,{
-      position:"top",
-      pauseOnHover:false
+      position:"top"
     })
   }
 }
@@ -109,4 +134,15 @@ const showToastPut = (msg:string): void => {
     })
   }
 }
+
+watch(delFlgSon,() => {
+  emit("delFlgs",delFlgSon.value)
+  console.log("emit2")
+  delFlgSon.value = false
+})
+
+const delFlgSecond = (delFlg:boolean) => {
+  delFlgSon.value = delFlg
+}
+
 </script>

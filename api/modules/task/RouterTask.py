@@ -1,35 +1,47 @@
 from fastapi import APIRouter,Depends,HTTPException
-import schemas.task as task_schema
-import cruds.task as task_crud
-import models.task as task_model
-from typing import List
+from pydantic import Json
+import modules.task.SchemaTask as task_schema
+import modules.task.ServiceTask as task_crud
+import modules.task.ModelsTask as task_model
 from db import get_db
 from peewee import PostgresqlDatabase
+import config
 
-db = PostgresqlDatabase("task_data",user="kaneko",password="goldsilver",host="postgresql",port=5432,autoconnect=True)
+db = PostgresqlDatabase(config.DB,user=config.DB_USER,password=config.DB_PASS,port=int(config.DB_PORT),host=config.DB_HOST)
 
 router = APIRouter()
 
 @router.get("/tasks",response_model=list[task_schema.Task])
 async def list_tasks(db: PostgresqlDatabase=Depends(get_db)):
-    test = await task_crud.get_tasks_with_done()
-    return [ task_schema.Task(id=i[0],title=i[1],done=i[2],due_date=i[3])  for i in test]
+    task = await task_crud.get_tasks_with_done()
+    if task is None:
+        raise HTTPException(status_code=404,detail="Task not found")
+    return [ task_schema.Task(id=i[0],title=i[1],done=i[2],due_date=i[3])  for i in task]
     #return True
     #return [task_schema.Task(id=1,title="1つ目のタスク",done=False)]
 
 @router.post("/tasks",response_model=task_schema.TaskCreateResponse)
 async def create_task(task_body: task_schema.TaskCreate,db: PostgresqlDatabase=Depends(get_db)):
+    task = await task_crud.get_tasks_with_done()
     print(task_body)
+    title = task_body.title
+    for i in task:
+        if i[1] == title:   
+            raise HTTPException(status_code=409,detail="Conflict")
     return  await task_crud.create_task(db,task_body)
 
 @router.put("/tasks/{task_id}")
 async def update_task(task_id:int,task_body: task_schema.TaskCreate,db: PostgresqlDatabase=Depends(get_db)):
     print("1111")
     task = await task_crud.get_task(task_id=task_id)
-    # task = task_model.Task.create(**task_body.model_dump())
+    # title = task_body.title
+    # done = task_body.done
     print(task_id)
-    print(task,"11111")
+    # for i in task: 
+    #     if i[1] == title and i[2] == done:
+    #         raise HTTPException(status_code=409,detail="Conflict")
     if task is None:
+        print("111")
         raise HTTPException(status_code=404,detail="Task not found")
     return await task_crud.update_task(db,task_body,original=task,task_id=task_id)
 
