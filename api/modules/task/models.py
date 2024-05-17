@@ -9,7 +9,7 @@ class Task(Base):
     due_date = DateField(formats=['%Y-%m-%d'])#formats指定しないとリクエストボディの値を参照しない
                                               #その場合、defaultまたは、null=Trueを設定しなければならない（not null Errorが起きる）
     done = BooleanField(default=False, column_name="done")
-    # category = CharField(null=false,unique=true)
+    category = CharField(null=False)
     # staus_id = IntegerField(null=false)
     class Meta:
         table_name = "tasks"

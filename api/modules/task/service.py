@@ -1,6 +1,6 @@
 from peewee import PostgresqlDatabase,DoesNotExist,JOIN
-import modules.task.ModelsTask as task_model
-import modules.task.SchemaTask as task_schema
+import modules.task.models as task_model
+import modules.task.schemas as task_schema
 from typing import List
 
 
@@ -19,6 +19,7 @@ async def get_tasks_with_done() -> List[task_model.Task]:
                 task_model.Task.title,
                 task_model.Task.done,
                 task_model.Task.due_date,
+                task_model.Task.category,
             )
             .join(task_model.Done, on=(task_model.Task.id == task_model.Done.task_id),join_type=JOIN.LEFT_OUTER)
             #.objects(constructor=task_model.Task)
@@ -27,13 +28,14 @@ async def get_tasks_with_done() -> List[task_model.Task]:
     #result = list(result)
     #print(result,"9999")
     #print( [ (i.id,i.title,i.done) for i in result ])
-    return [ (i.id,i.title,i.done,i.due_date) for i in result ]
+    return [ (i.id,i.title,i.done,i.due_date,i.category) for i in result ]
 
 async def update_task(db:PostgresqlDatabase,task_create:task_schema.TaskCreate,
                         original:task_model.Task,task_id:int)-> task_model.Task:
     task = task_model.Task.get(task_model.Task.id == task_id)
     task.title = task_create.title
     task.done = task_create.done
+    task.category = task_create.category
     #task_model.Task.update(title = task_create).where(task_model.Task.id == task_id)
     task.save()
     #task = task_model.Task(title=original)

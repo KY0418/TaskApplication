@@ -1,5 +1,5 @@
 from fastapi import FastAPI 
-from modules.task import RouterTask
+from modules.task import api
 from modules.done import RouterDone
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -16,7 +16,7 @@ app.add_middleware(
       allow_headers = ["*"]
   )
 
-app.include_router(RouterTask.router)
+app.include_router(api.router)
 
 app.include_router(RouterDone.router)
 

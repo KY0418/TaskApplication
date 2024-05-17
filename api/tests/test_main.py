@@ -5,7 +5,7 @@ from httpx import AsyncClient,ASGITransport
 from peewee import *
 import starlette.status
 
-from api.modules.task.ModelsTask import Task,Done
+from api.modules.task.models import Task,Done
 from api.db import get_db
 from api.main import app
 

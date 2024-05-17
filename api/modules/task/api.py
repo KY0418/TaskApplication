@@ -1,8 +1,8 @@
 from fastapi import APIRouter,Depends,HTTPException
 from pydantic import Json
-import modules.task.SchemaTask as task_schema
-import modules.task.ServiceTask as task_crud
-import modules.task.ModelsTask as task_model
+import modules.task.schemas as task_schema
+import modules.task.service as task_crud
+import modules.task.models as task_model
 from db import get_db
 from peewee import PostgresqlDatabase
 import config
@@ -16,7 +16,7 @@ async def list_tasks(db: PostgresqlDatabase=Depends(get_db)):
     task = await task_crud.get_tasks_with_done()
     if task is None:
         raise HTTPException(status_code=404,detail="Task not found")
-    return [ task_schema.Task(id=i[0],title=i[1],done=i[2],due_date=i[3])  for i in task]
+    return [ task_schema.Task(id=i[0],title=i[1],done=i[2],due_date=i[3],category=i[4])  for i in task]
     #return True
     #return [task_schema.Task(id=1,title="1つ目のタスク",done=False)]
 
@@ -25,14 +25,17 @@ async def create_task(task_body: task_schema.TaskCreate,db: PostgresqlDatabase=D
     task = await task_crud.get_tasks_with_done()
     print(task_body)
     title = task_body.title
+    if task is None:
+        raise HTTPException(status_code=404,detail="Task not found")
     for i in task:
         if i[1] == title:   
-            raise HTTPException(status_code=409,detail="Conflict")
+            raise HTTPException(status_code=409,detail="Conflict")  
     return  await task_crud.create_task(db,task_body)
 
 @router.put("/tasks/{task_id}")
 async def update_task(task_id:int,task_body: task_schema.TaskCreate,db: PostgresqlDatabase=Depends(get_db)):
     print("1111")
+    # ID検索結果のタイトルを格納している
     task = await task_crud.get_task(task_id=task_id)
     # title = task_body.title
     # done = task_body.done

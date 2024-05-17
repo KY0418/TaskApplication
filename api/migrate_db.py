@@ -1,5 +1,5 @@
 from peewee import PostgresqlDatabase
-from api.modules.task.ModelsTask import Task,Done
+from modules.task.models import Task,Done
 import config
 
 #from api.models.task import BaseModel

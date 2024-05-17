@@ -6,7 +6,7 @@ div.modal
             p.mt-6.text-center 対象のタスクを削除しますがよろしいですか？
             ul
                 li.float-left.yes
-                    button(@click="delOk").border-solid.border-white.rounded-10px.p-2.mr-6.text-white.text-sm.bg-blue-500 はい
+                    button(@click="delt").border-solid.border-white.rounded-10px.p-2.mr-6.text-white.text-sm.bg-blue-500 はい
                 li
                     button(@click="delCancel").ml-4.border-solid.border-white.text-white.rounded-10px.text-sm.p-2.bg-red-500 いいえ
 </template>
@@ -53,11 +53,21 @@ button{
 
 </style>
 <script setup lang="ts">
+import axios from 'axios';
+import { ref,watch } from 'vue';
+
+interface delData {
+    id:number
+    deltitle:string
+}
 
 interface Emits {
     (event:"delAgree"):void
     (event:"delNotAgree"):void
+    (event:"delEmit",msg:string,flg:number):void
+    (event:"delFlgOrigin",delflg:boolean):void
 }
+const props = defineProps<delData>()
 
 const emit = defineEmits<Emits>()
 
@@ -65,8 +75,43 @@ const delCancel = (): void => {
     emit("delNotAgree")
 }
 
-const delOk = (): void => {
-    emit("delAgree")
+const tsMsg = ref('')
+const delCompFlg = ref(false)
+let apiUrl = 'http://localhost:8000/tasks/'
+
+watch(delCompFlg,() => {
+  console.log("delemit1")
+  emit("delFlgOrigin",delCompFlg.value)
+  console.log(delCompFlg.value)
+  delCompFlg.value = false
+})
+
+// DELETE関数
+const delt = async (): Promise<void> => {
+  console.log(apiUrl)
+  console.log(props.id)
+//   let merId = 
+//   if(apiUrl.includes(String(props.id)) === false){
+//     
+//   }
+apiUrl = `${apiUrl}${props.id}`
+console.log(apiUrl)
+const response = await axios.delete(apiUrl)
+  .then(response =>{
+    if(response.status == 200 || response.status == 201){
+      console.log("deleteが成功しました")
+      tsMsg.value = "削除完了"
+      let tFlg = 0
+      emit("delEmit",tsMsg.value,tFlg)
+      delCompFlg.value = true
+  }
+})
+  .catch(error => {
+    console.error("Failrd to delete error:",error)
+    let tFlg = 1
+    tsMsg.value = error.response.data.detail
+    emit("delEmit",tsMsg.value,tFlg)
+  })
 }
 
 </script>

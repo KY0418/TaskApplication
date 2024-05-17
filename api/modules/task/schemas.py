@@ -5,6 +5,7 @@ class TaskBase(BaseModel):
     title : str | None = Field(None)
     due_date: datetime.date | str | None  = Field(None)
     done: bool = Field(None)
+    category: str = Field(None)
 
 
 class TaskCreate(TaskBase):

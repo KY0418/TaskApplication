@@ -8,16 +8,22 @@ div.sample-popup-window
           label.block.mt-4.ml-4 タスクタイトル
             div.mt-4.ml-10
               input(type="text" v-model="newtitle" ).w-60.tt
-          label.block.mt-8.ml-4.mr-4.mb-4 ステータス
-            div.mt-4.ml-12.rd
-              input(type="radio" v-model="TrueOrFalse" :value="false").float-left
-              span 未着手
-              input(type="radio" v-model="TrueOrFalse" :value="true").ml-5
-              span 完了
+          label.block.mt-4.ml-4 カテゴリー
+            div.ml-10.mt-4
+              select(v-model="category").tt
+                option(value="仕事") 仕事
+                option(value="プライベート") プライベート
+                option(value="完了") 完了
+          label.block.mt-4.ml-4.mr-4.mb-6 ステータス
+              div.ml-12.rd
+                input(type="radio" v-model="TrueOrFalse" :value="false").float-left
+                span.mt-2 未着手
+                input(type="radio" v-model="TrueOrFalse" :value="true").ml-5
+                span 完了
           label.block
             div.mt-4.ml-17.rd
-              button(type="button" @click="put").border-solid.border-white.rounded-5px.bg-blue 更新
-              button(type="button" @click="popupClose").border-solid.border-white.rounded-5px.bg-red.ml-8.float-right  キャンセル
+              button(type="button" @click="put").border-solid.border-white.rounded-5px.bg-blue.mb-5.btn 更新
+              button(type="button" @click="popupClose").border-solid.border-white.rounded-5px.bg-red.ml-8.mb-5.float-right.btn  キャンセル
 </template>
 
 <style lang="scss" scoped>
@@ -39,7 +45,7 @@ div.sample-popup-window
 	z-index: 1100;
 	background: #fff;
 	// padding: 2%;
-  height:55%;
+  height:auto;
   width: 40%;
 	top: 50%;
 	left: 50%;
@@ -56,8 +62,12 @@ div.sample-popup-window
   width: 80%;
 }
 .rd {
-  margin: 0 auto;
+  margin: auto;
   width:50%
+}
+
+.btn {
+  width: 40%;
 }
 </style>
 
@@ -70,7 +80,8 @@ import { useToast } from 'vue-toast-notification';
 interface defData {
     title:string,
     status:boolean,
-    id: number
+    id: number,
+    category:string,
 }
 
 const props = defineProps<defData>()
@@ -79,10 +90,11 @@ let newtitle = ref(props.title)
 const title  = ref(props.title)
 const toast = useToast()
 let tasknum : number
+const upflg = ref(false)
 
 interface Emits {
 	(event:"changetitle",title:string):void
-	(event:"changeSwitch"):void
+	(event:"changeSwitch",flg:boolean):void
 	(event:"showtoast",msg:string,flg:number):void
 	(event:"taskstatus",status:string):void
 }
@@ -95,12 +107,12 @@ const tsMsg = ref("")
 let apiUrl = 'http://localhost:8000/tasks/'
 const tList = ref([""])
 const taskState = ref("")
+const category = ref(props.category)
 let tFlg:number
 const defData = reactive ({
   due_date: "2024-05-13",
   done: false,
 })
-
 
 const changeStatus = (status: boolean): string => {
   let retStr = ""
@@ -122,31 +134,27 @@ watch(TrueOrFalse,(newvalue) => {
 
 const put = async () : Promise<void> => {
 console.log("111",newtitle.value == props.title && TrueOrFalse.value == props.status)
-// await getData()
-if(newtitle.value == props.title && TrueOrFalse.value == props.status){
-  // toast.error("そのタスクは既に存在しています" ,{
-  //   position:"top"
-  // })
-  const a = 0
-}
 console.log("search ",apiUrl.includes(String(props.id)))
 if(apiUrl.includes(String(props.id)) === false){
   apiUrl = `${apiUrl}${props.id}`
 }
 console.log(apiUrl,"  URL TEST",props.id,"  task NUMBER")
-console.log(newtitle.value,TrueOrFalse.value)
+console.log(category.value,"val check")
 const response = await axios.put( apiUrl,{
     title: newtitle.value,
     due_date: "2024-05-13",
     done:TrueOrFalse.value,
+    category: category.value,
   })
   .then(response => {
     console.log("PUTが成功しました")
     tsMsg.value = "更新完了"
     tFlg = 0
+    upflg.value = !upflg.value
     emit("changetitle",newtitle.value)
-    emit("changeSwitch")
+    emit("changeSwitch",upflg.value)
     emit("taskstatus",taskState.value)
+    upflg.value = !upflg.value
   })
   .catch(error => {
     tFlg = 1
@@ -160,7 +168,8 @@ const response = await axios.put( apiUrl,{
   }
 
 const popupClose = (): void => {
-	emit("changeSwitch")	
+	emit("changeSwitch",upflg.value)	
+
 }
 </script>
 

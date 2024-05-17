@@ -1,10 +1,12 @@
 <template lang="pug">
-div.border-solid.border-red.rounded-25px.m-4.w-70.taskBox
-    input(type="text" v-model="mainTitle").text-red.mt-2.ml-2.tb 
-    div.taskCont
-      taskContent(v-for="item in props.responseData" v-bind:title="item.title" v-bind:status="item.done" v-bind:id="item.id"
-                  v-on:createTitle="changeTitle" v-on:changeState="changeStatus" v-on:changePopupStatus="changeSwitch" v-on:updateId="updateId" v-on:showtoast="showToast"
-                  v-on:handData="getUpdFlg" v-on:delFlg="delFlgSecond")
+div.whole
+  //- router-link(:to="{name:'taskadd'}" v-on:toastFlg="showToastPost" v-bind:test="props.responseData").add.block.mt-4.ml-4.mb-4.bg-blue.text-xl.text-white.border-solid.border-white.rounded-10px.text-center ＋タスクを追加
+  div.border-solid.border-red.rounded-25px.ml-4.w-70.float-left.taskBox
+      p.text-red.mt-2.ml-2.w-30.tb {{ catTitle }} 
+      div
+        TaskContent(v-for="item in props.responseData" v-bind:title="item.title" v-bind:status="item.done" v-bind:id="item.id" v-bind:category="item.category"
+                    v-on:createTitle="changeTitle" v-on:changeState="changeStatus" v-on:changePopupStatus="changeSwitch" v-on:updateId="updateId" v-on:showtoast="showToast"
+                    v-on:handData="getUpdFlg" v-on:delFlg="delFlgSecond")
 
 </template>
 <style lang="scss" scoped >
@@ -20,27 +22,46 @@ input {
   outline: none;
   background-color: #FFE382;}
 
+.add {
+  text-decoration: none;
+  width:15%;
+}
+
+
 </style>      
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import taskContent from "../components/TaskContent.vue"
+import { computed, ref, watch } from 'vue';
+import TaskContent from "../components/TaskContent.vue"
 import { useToast } from 'vue-toast-notification';
+import { fa } from 'vuetify/locale';
 
 // 検索対象のタイトル
-const tasktitle = ref("")
+const tasktitle = ref("")     
 // タスクのステータス
 const taskstatus = ref("") 
 const status = ref(false)
-// 新規タスクタイトル
-const mainTitle = ref("タスクタイトル")
+// カテゴリータイトル
+const catTitle = ref('')
 // レコードを検索するためのID
 const searchId = ref(0)
 // 編集ポップアップ表示のフラグ
 let show = ref(false)
 // トーストのインスタンス
 const toast = useToast()
+// updateフラグ
 const updFlgSon = ref(false)
+// deleteフラグ
 const delFlgSon = ref(false)
+// カテゴリーごとのタスクを検索するための配列
+const categoryList = ['']
+const getFlg = ref(false)
+//　フラグ（名前変える）
+let changetitle = ref(false)
+const completeTaks = ref({})
+// カテゴリーがプライベートのタスクを格納
+const privateTaks = ref({})
+// カテゴリーが仕事のタスクを格納
+const workTasks = ref({})
 // Propsデータを受け取るためのinterface
 interface defData {
   responseData: {
@@ -48,8 +69,39 @@ interface defData {
     due_date: string
     id: number
     done: boolean
-  }[]
+    category:string
+  }[],
+  flg:boolean
 }
+
+// Props受け取りデータ格納変数
+const props = defineProps<defData>()
+const catList = props.responseData.map((task) => task.category)
+catTitle.value = catList[0]
+console.log(catTitle.value)
+// 親コンポーネントでGETが完了したかどうか監視する
+// const isFlgChanged = computed(() => props.flg);
+// console.log(props.responseData)
+// watch(isFlgChanged, () =>{
+//   const catList = props.responseData.map((task) => task.category)
+//   catTitle.value = catList[0]
+//   console.log(catTitle.value)
+  // for(const i of props.responseData){ 
+  //   if(categoryList.includes(i.category) === false){
+  //     categoryList.push(i.category)
+  //   }
+  // console.log(categoryList)
+  // console.log(props.responseData,"test")
+  // // completeTaks.value = props.responseData.filter((task) => task.category === "complete")
+  // privateTaks.value = props.responseData.filter((task) => task.category === "private")
+  // workTasks.value = props.responseData.filter((task) => task.category === "work")
+
+  // console.log(workTasks.value)
+
+  // changetitle.value = false
+  // }
+// })
+  
 
 interface Emits {
   (event:"handFlg",flg:boolean):void
@@ -63,6 +115,7 @@ const getUpdFlg = (flg:boolean): void => {
   console.log("emit2 ",flg)
 }
 
+// よく分からない
 const value:string | null = window.localStorage.getItem('tflg')
 console.log(value)
 if(value === "success"){
@@ -78,13 +131,17 @@ watch(updFlgSon,() => {
   updFlgSon.value = false
 })
 
-const delshow = ref(false)
-
-// Props受け取りデータ格納変数
-const props = defineProps<defData>()
 
 // リクエスト先のURL
 let apiUrl = 'http://localhost:8000/tasks/'
+
+// タスク追加のトースト表示
+const showToastPost = (msg: string): void => {
+  toast.success(msg,{
+    position:"top",
+    queue:false
+  })
+}
 
 // 以下の5つの関数はemitで受け取った値を処理する
 const changeTitle = (newTitle:string): void => {
@@ -118,6 +175,7 @@ const showToast = (msg:string,flg:number): void => {
   }
 }
 
+// showtoastに合わせれば消せる
 const showToastPut = (msg:string): void => {
   if(msg === "更新完了"){
     toast.success(msg,{
@@ -130,14 +188,13 @@ const showToastPut = (msg:string): void => {
       position:"top",
       pauseOnHover:false,
       queue: false
-
     })
   }
 }
 
 watch(delFlgSon,() => {
   emit("delFlgs",delFlgSon.value)
-  console.log("emit2")
+  console.log("delemit3",delFlgSon.value)
   delFlgSon.value = false
 })
 

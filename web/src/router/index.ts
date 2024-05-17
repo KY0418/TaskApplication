@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import AppHome from '@/views/AppHome.vue'
 import TaskAdd from '@/views/TaskAdd.vue'
+import TaskBox from '@/views/TaskBox.vue'
 
 const routeSettings :RouteRecordRaw[] = [
   {
@@ -13,6 +14,11 @@ const routeSettings :RouteRecordRaw[] = [
     path:'/TaskAdd',
     name:"taskadd",
     component:TaskAdd
+  },
+  {
+    path:'/TaskBox',
+    name:'taskhome',
+    component:TaskBox
   },
 ]
 

@@ -4,21 +4,26 @@ div.boxtitle
       router-link(:to="{name:'apphome'}").text-xl.mt-2.float-right.text-black.home Home
 div
   p.mt-5.ml-5.text-xl タスク追加
-    div.border-solid.rounded-22px.border-gray.ml-6.mt-4.mb-4.w-145
-      table
-          tr
-            td.pt-2.pb-2.pl-2.tr1
-                label(for="postdata")  タスクタイトル：
-                  input(type="text" name="sample" id="postdata" v-model="defData.title").ml-8.w-93.te
-          tr
-            td.pt-2.pb-2.pl-2
-              label ステータス：
-                input(type="radio"  v-model="TrueOrFalse" value="false" checked).ml-35
-                span.mr-2 未着手
-                input(type="radio" v-model="TrueOrFalse" value="true" )
-                span 完了
+    div.border-solid.rounded-22px.border-gray.ml-6.mt-4.w-180
+      div.tt.mt-2.mb-2
+        span.pt-2.ml-2.bor タスクタイトル
+        input(type="text" name="sample" id="postdata" v-model="defData.title").ml-8.w-90.te
+      div.tr1
+      div.ml-2.mt-2.mb-2
+        span カテゴリー        
+        select(v-model="category").cat.rounded-8px.ml-35
+          option(value="仕事") 仕事
+          option(value="プライベート") プライベート
+          option(value="完了") 完了
+      div.tr1 
+      div.ts.mt-2.mb-2
+        span.mt-2.ml-2.mb-2.bor ステータス
+          input(type="radio"  v-model="TrueOrFalse" value="false" checked).ml-35
+          span.mr-2 未着手
+          input(type="radio" v-model="TrueOrFalse" value="true" )
+          span 完了
 div.ml-120
-    button(type="button" @click="post").border-solid.rounded-15px.border-white.text-white.p-1 タスク追加   
+    button(type="button" @click="post").border-solid.rounded-10px.border-white.text-white.text-xl.mt-2.p-1 +タスクを追加   
 </template>
 
 <style lang="scss" scoped>
@@ -49,14 +54,39 @@ h1 {
 
 }
 
-.tr1 {
-  border-bottom-style:solid ;
-  border-color: aliceblue;
+.cat{
+  text-align: center;
 }
+
+.tr1 {
+  border-top-style:solid;
+  border-right: solid;
+  border-color: rgb(9, 85, 151);
+}
+
+// .te::before{
+//   content: "";
+//   width:1px;
+//   height: 5px;
+//   border-right-style: solid;
+//   border-color: rgb(9, 85, 151);
+// }
 
 button{
   background-color: #0000FF;
+  margin-left: 27%;
 }
+
+.tr2{
+  display: inline;
+  border-right-style: solid;
+  
+}
+
+// .bor{
+//   display:inline;
+//   border-right-style:solid;
+// }
 
 .te:focus {
   background-color: white;
@@ -78,13 +108,13 @@ interface Emits {
 
 const emit = defineEmits<Emits>()
 
-// Propsデータを受け取るためのinterface
 interface defData {
   responseData: {
     title: string
     due_date: string
     id: number
     done: boolean
+    category:string
   }[]
 }
 
@@ -107,13 +137,16 @@ const TrueOrFalse = ref(false)
 // タスクのステータス
 const taskStatus = ref(false)
 
+// タスクのカテゴリー
+const category = ref('仕事')
+
 // リクエスト先のURL
 const apiUrl = 'http://localhost:8000/tasks';
 
 // POSTデータ
 const defData = reactive ({
   title: ref(""),
-  due_date: "2024-05-13",
+  due_date: "2024-05-16",
   done:TrueOrFalse.value
 })
 
@@ -155,6 +188,7 @@ const post = async () : Promise<any> => {
       title:defData.title,
       due_date:"2024-05-13",
       done:TrueOrFalse.value,
+      category:category.value
     })
     .then(response => {
       if (response.status === 200 || response.status === 201) {

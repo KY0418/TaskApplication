@@ -1,5 +1,5 @@
 from peewee import PostgresqlDatabase
-import modules.task.ModelsTask as task_model
+import modules.task.models as task_model
 
 async def get_done(task_id: int):
     print(task_id)

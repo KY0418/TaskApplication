@@ -1,5 +1,5 @@
 from peewee import *
-from api.modules.task.ModelsTask import Task,Done
+from api.modules.task.models import Task,Done
 from db import Base
 
 #from api.models.task import BaseModel
