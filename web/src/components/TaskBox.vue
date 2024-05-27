@@ -1,10 +1,9 @@
 <template lang="pug">
 div.whole
-  //- router-link(:to="{name:'taskadd'}" v-on:toastFlg="showToastPost" v-bind:test="props.responseData").add.block.mt-4.ml-4.mb-4.bg-blue.text-xl.text-white.border-solid.border-white.rounded-10px.text-center ＋タスクを追加
   div.border-solid.border-red.rounded-25px.ml-4.w-70.float-left.taskBox
       p.text-red.mt-2.ml-2.w-30.tb {{ catTitle }} 
       div
-        TaskContent(v-for="item in props.responseData" v-bind:title="item.title" v-bind:status="item.done" v-bind:id="item.id" v-bind:category="item.category"
+        TaskContent(v-for="item in props.responseData" v-bind:title="item.title" v-bind:status="item.status_id" :id="item.id" :category="item.category" :st_id="item.staff_id" :pri_id="item.priority_id"
                     v-on:createTitle="changeTitle" v-on:changeState="changeStatus" v-on:changePopupStatus="changeSwitch" v-on:updateId="updateId" v-on:showtoast="showToast"
                     v-on:handData="getUpdFlg" v-on:delFlg="delFlgSecond")
 
@@ -30,11 +29,13 @@ input {
 
 </style>      
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import TaskContent from "../components/TaskContent.vue"
 import { useToast } from 'vue-toast-notification';
-import { fa } from 'vuetify/locale';
+import { useGetTaskStore } from '@/stores/getTask';
 
+
+const task_store = useGetTaskStore()
 // 検索対象のタイトル
 const tasktitle = ref("")     
 // タスクのステータス
@@ -66,10 +67,11 @@ const workTasks = ref({})
 interface defData {
   responseData: {
     title: string
-    due_date: string
     id: number
-    done: boolean
+    status_id: number
     category:string
+    staff_id:string
+    priority_id:number
   }[],
   flg:boolean
 }
@@ -77,7 +79,12 @@ interface defData {
 // Props受け取りデータ格納変数
 const props = defineProps<defData>()
 const catList = props.responseData.map((task) => task.category)
+const catListSt = props.responseData.map((task) => task.status_id)
+console.log(catList)
 catTitle.value = catList[0]
+if(catListSt[0] == 2){
+  catTitle.value = "完了"
+}
 console.log(catTitle.value)
 // 親コンポーネントでGETが完了したかどうか監視する
 // const isFlgChanged = computed(() => props.flg);
@@ -101,7 +108,14 @@ console.log(catTitle.value)
   // changetitle.value = false
   // }
 // })
-  
+
+
+const handingData = ref(props.responseData)
+
+watch(props.responseData,(newvalue)=>{
+  handingData.value = newvalue
+  console.log("test watch")
+})
 
 interface Emits {
   (event:"handFlg",flg:boolean):void

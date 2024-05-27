@@ -16,7 +16,8 @@ async def list_tasks(db: PostgresqlDatabase=Depends(get_db)):
     task = await task_crud.get_tasks_with_done()
     if task is None:
         raise HTTPException(status_code=404,detail="Task not found")
-    return [ task_schema.Task(id=i[0],title=i[1],done=i[2],due_date=i[3],category=i[4])  for i in task]
+    task.sort()
+    return [ task_schema.Task(id=i[0],title=i[1],category=i[2],status_id=i[3],staff_id=i[4],priority_id=i[5])  for i in task]
     #return True
     #return [task_schema.Task(id=1,title="1つ目のタスク",done=False)]
 

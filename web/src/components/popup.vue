@@ -8,6 +8,13 @@ div.sample-popup-window
           label.block.mt-4.ml-4 タスクタイトル
             div.mt-4.ml-10
               input(type="text" v-model="newtitle" ).w-60.tt
+          label.block.mt-4.ml-4.mr-4.mb-6 優先度
+            div.ml-10.mt-4
+              select(v-model="priority").tt
+                option( value="1" ) 緊急度高、緊急度高
+                option( value="2" ) 緊急度高、緊急度低
+                option( value="3" ) 緊急度低、緊急度高
+                option( value="4" ) 緊急度低、緊急度低
           label.block.mt-4.ml-4 カテゴリー
             div.ml-10.mt-4
               select(v-model="category").tt
@@ -15,11 +22,13 @@ div.sample-popup-window
                 option(value="プライベート") プライベート
                 option(value="完了") 完了
           label.block.mt-4.ml-4.mr-4.mb-6 ステータス
-              div.ml-12.rd
-                input(type="radio" v-model="TrueOrFalse" :value="false").float-left
+              div.rd
+                input(type="radio" v-model="TrueOrFalse" :value="1").float-left
                 span.mt-2 未着手
-                input(type="radio" v-model="TrueOrFalse" :value="true").ml-5
+                input(type="radio" v-model="TrueOrFalse" :value="2").ml-5
                 span 完了
+                input(type="radio" v-model="TrueOrFalse" :value="3").ml-5
+                span 進行中
           label.block
             div.mt-4.ml-17.rd
               button(type="button" @click="put").border-solid.border-white.rounded-5px.bg-blue.mb-5.btn 更新
@@ -63,7 +72,7 @@ div.sample-popup-window
 }
 .rd {
   margin: auto;
-  width:50%
+  width:60%
 }
 
 .btn {
@@ -76,18 +85,23 @@ import axios from 'axios'
 import { ref,reactive, computed, watch } from 'vue';
 import type { responseData,eventFLG} from '@/interfaces'
 import { useToast } from 'vue-toast-notification';
+import { useGetTaskStore } from '@/stores/getTask';
+
+const taskStore = useGetTaskStore()
 
 interface defData {
     title:string,
-    status:boolean,
+    status:number,
     id: number,
     category:string,
+    pri_id:number,
 }
 
 const props = defineProps<defData>()
 const TrueOrFalse = ref(props.status)
 let newtitle = ref(props.title)
 const title  = ref(props.title)
+const priority = ref(props.pri_id)
 const toast = useToast()
 let tasknum : number
 const upflg = ref(false)
@@ -109,10 +123,6 @@ const tList = ref([""])
 const taskState = ref("")
 const category = ref(props.category)
 let tFlg:number
-const defData = reactive ({
-  due_date: "2024-05-13",
-  done: false,
-})
 
 const changeStatus = (status: boolean): string => {
   let retStr = ""
@@ -125,10 +135,12 @@ const changeStatus = (status: boolean): string => {
 }
 
 watch(TrueOrFalse,(newvalue) => {
-    if(newvalue){
-      taskState.value = '完了'
-    }else {
-      taskState.value = "未着手"
+    if(newvalue == 1){
+      taskState.value = '未完'
+    }else if(newvalue == 2){
+      taskState.value = "完了"
+    }else if(newvalue == 3){
+      taskState.value = "進行中"
     }
   })
 
@@ -142,9 +154,9 @@ console.log(apiUrl,"  URL TEST",props.id,"  task NUMBER")
 console.log(category.value,"val check")
 const response = await axios.put( apiUrl,{
     title: newtitle.value,
-    due_date: "2024-05-13",
-    done:TrueOrFalse.value,
     category: category.value,
+    status_id:TrueOrFalse.value,
+    priority_id:priority.value,
   })
   .then(response => {
     console.log("PUTが成功しました")
@@ -165,6 +177,7 @@ const response = await axios.put( apiUrl,{
   })
   })
   emit("showtoast",tsMsg.value,tFlg)
+  await taskStore.get()
   }
 
 const popupClose = (): void => {

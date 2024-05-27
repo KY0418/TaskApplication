@@ -24,6 +24,7 @@ services:
       TZ: Asia/Tokyo
     volumes:
       - postgres_data:/var/lib/postgres
+      
     ports:
       - 5432:5432
 

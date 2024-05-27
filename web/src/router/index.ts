@@ -2,7 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import AppHome from '@/views/AppHome.vue'
 import TaskAdd from '@/views/TaskAdd.vue'
-import TaskBox from '@/views/TaskBox.vue'
+import TaskBox from '@/components/TaskBox.vue'
+import ManagementStaff from '@/views/ManagementStaff.vue'
+import StaffAdd from '@/views/StaffAdd.vue'
+import Calendar from '@/views/Calendar.vue'
 
 const routeSettings :RouteRecordRaw[] = [
   {
@@ -16,10 +19,21 @@ const routeSettings :RouteRecordRaw[] = [
     component:TaskAdd
   },
   {
-    path:'/TaskBox',
-    name:'taskhome',
-    component:TaskBox
+    path: '/ManagementStaff',
+    name:'managementstaff',
+    component:ManagementStaff,
+    props:true
   },
+  {
+    path: '/StaffAdd',
+    name:'staffadd',
+    component:StaffAdd
+  },
+  {
+  path:'/Calendar',
+  name:'calender',
+  component:Calendar
+  }
 ]
 
 const router = createRouter({

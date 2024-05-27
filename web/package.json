@@ -20,6 +20,8 @@
     "@unocss/extractor-pug": "^0.59.4",
     "@unocss/preset-uno": "^0.59.4",
     "axios": "^1.6.8",
+    "dayjs": "^1.11.11",
+    "dotenv": "^16.4.5",
     "pinia": "^2.1.7",
     "primevue": "^3.52.0",
     "unocss": "^0.59.4",
