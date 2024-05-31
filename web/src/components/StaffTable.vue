@@ -31,10 +31,6 @@ table{
 .t1,.t2{
     border-right: 1px solid black;
 }
-.d1,.d2 {
-    border-top: solid 1px black;
-    border-right: solid 1px black;
-}
 
 
 </style>

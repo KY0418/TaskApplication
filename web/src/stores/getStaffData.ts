@@ -12,7 +12,8 @@ export const useGetStaffStore = defineStore({
     data:ref([]) ,
     getflg: ref(0),
     delflg: ref(1),
-    postflg:ref(false)
+    postflg:ref(false),
+    search_data:ref()
   }),
   getters:{
     getStname: (data) => {
@@ -42,6 +43,17 @@ actions: {
     })
     
     },
+  async search_staff(st_id:string): Promise<void>{
+    console.log(this.$state.getflg)
+    const apiURL = `${apiUrlSt}/${st_id}`
+    const response =  await axios.get(apiURL as string)
+    .then(response =>{
+      this.$state.search_data = response.data
+      console.log(response.data)
+    }).catch(error =>{
+      console.log("failed to get request")
+    })
+  },
   async post(st_name:string): Promise<void> {
     const response = await axios.post(apiUrlSt as string,{
       staff_name: st_name,

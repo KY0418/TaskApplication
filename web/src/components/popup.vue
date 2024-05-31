@@ -170,7 +170,6 @@ const response = await axios.put( apiUrl,{
   })
   .catch(error => {
     tFlg = 1
-    console.log("Failed to update error:",error.response.data.detail)
     tsMsg.value = error.response.data.detail
     toast.error(tsMsg.value ,{
     position:"top"

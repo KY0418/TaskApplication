@@ -4,6 +4,7 @@ div.boxtitle
       div.float-right
           router-link(:to="{name:'apphome'}").text-xl.mt-2.text-white.mr-4.home Home
           router-link(:to="{name:'managementstaff'}").text-xl.mt-2.mr-2.text-white.home 職員一覧
+          router-link(:to="{name:'calender'}").text-xl.mt-2.text-white.mr-4.home カレンダー
 router-link(:to="{name:'taskadd'}" v-on:toastFlg="showToastPost").add.block.mt-4.ml-4.mb-4.bg-blue.text-xl.text-white.border-solid.border-white.rounded-10px.text-center ＋タスクを追加
 div
   TaskBox(v-for="item in workListTr" :responseData="item" :flg="tList" v-on:handFlg="updFlgParent" v-on:delFlgs="delFlgParent")
@@ -39,7 +40,6 @@ h1 {
 import { RouterView} from "vue-router";
 import {useRouter} from "vue-router"
 import {computed, onMounted,reactive,ref, watch} from "vue"
-import { useCounterStore } from "@/stores/counter";
 import TaskBox from "../components/TaskBox.vue"
 import TaskAdd from "./TaskAdd.vue";
 import axios, { Axios, type AxiosResponse } from 'axios'
@@ -108,60 +108,6 @@ const initializeGettitle = async (): Promise<void> => {
       workList.value.push(completeTasks.value as never)
       }
   workListTr.value = workList.value 
-  // const response = await axios.get(apiUrl,{
-  //   })
-  //   .then(response =>{
-  //     if (response.status === 200 || response.status === 201) {
-  //       console.log('リクエストが成功しました');
-  //       console.log('レスポンスデータ:', response.data);
-  //       globalList.value = response.data
-  //       const workList = ref([])
-  //       console.log(workList.value)
-  //       completeTasks.value = globalList.value.filter((task) => task["category"] === "完了" || task["status_id"] == 2)
-  //       privateTasks.value = globalList.value.filter((task) => task["category"] === "プライベート" && task["status_id"] != 2)
-  //       workTasks.value = globalList.value.filter((task) => task["category"] === "仕事" && task["status_id"] != 2)
-  //       if(workTasks.value.length > 0){
-  //         workList.value.push(workTasks.value as never)
-  //       }
-  //       if(privateTasks.value.length > 0){
-  //         workList.value.push(privateTasks.value as never)
-  //       }
-  //       if(completeTasks.value.length > 0){
-  //         workList.value.push(completeTasks.value as never)
-  //       }
-  //       console.log(workTasks.value,"work")
-  //       console.log(privateTasks.value,"private")
-  //       workListTr.value = workList.value
-  //       tList.value = !tList.value
-  //       console.log(workList.value,"送信データ")
-  //       tList.value = !tList.value
-  //       console.log(globalList.value,"GET OK")
-  //   }
-  // })
-  //   .catch(error => {
-  //     console.error('GETリクエスト中にエラーが発生しました:', error);
-  //     error.response.data.detail = "タスクがありません"
-  //     toast.error(error.response.data.detail,{
-  //       position:"top"
-  //     })
-  //   })
-  //   const staffResponse = await axios.get(apiUrlSt)   
-  //   .then(response => {
-  //     if (response.status === 200 || response.status === 201) {
-  //       console.log('リクエストが成功しました');
-  //       console.log('レスポンスデータ:', response.data);
-  //       globalListStaff = response.data 
-        
-  //       console.log(globalListStaff)
-  //       }
-  //     }
-  //   ).catch(error => {
-  //     console.error('GETリクエスト中にエラーが発生しました:', error);
-  //     error.response.data.detail = "タスクがありません"
-  //     toast.error(error.response.data.detail,{
-  //       position:"top"
-  //     })
-  //   })
 }
 
 watch(get_task.data,async() => {

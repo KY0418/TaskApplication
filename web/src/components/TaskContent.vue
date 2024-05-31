@@ -10,6 +10,7 @@ div(v-if="tasktitle!==''").block.border-solid.border-white.rounded-20px.bg-white
         span(v-show="props.pri_id == 3").ml-4.bg-blue-5.boder-solid.rounded-5px.text-3.imptag {{ importance }}
         span(v-show="props.pri_id == 4").ml-4.bg-gray-5.boder-solid.rounded-5px.text-3.imptag {{ importance }}
         li.block.mt-2.mb-2 {{ tasktitle }}
+        li.text-xs.color-gray {{ props.start_date }}
         li
             button(type="button" @click="UpdMod").border-solid.border-white.rounded-5px.text-white.bg-green.text-sm.ml-28.p-1 編集
             button(type="button" @click="DelModal").block.float-right.border-solid.border-white.rounded-5px.text-white.bg-red.text-sm.ml-4.mr-4.p-1 削除
@@ -53,6 +54,7 @@ interface taskContentData {
     category:string,
     st_id:string,
     pri_id:number
+    start_date:string
 }
 
 interface Emits {
@@ -71,7 +73,7 @@ const props = defineProps<taskContentData>()
 const emit = defineEmits<Emits>()
 const taskStore = useGetTaskStore()
 const importance_store = usegetImportStore()
-const emList:string[] = ["緊急度高、緊急度高","重要度高、緊急度低","重要度低、、緊急度高","重要度低、緊急度低"]
+const emList:string[] = ["重要度高、緊急度高","重要度高、緊急度低","重要度低、緊急度高","重要度低、緊急度低"]
 const p_id = ref(props.pri_id)
 const importance = ref()
 const swap = ref(props)
@@ -121,13 +123,13 @@ const p_idGet = async (id:number): Promise<void> => {
     }
   }
   console.log(importanceList.value)
-  if(importanceList.value === "緊急度高、緊急度高"){
+  if(importanceList.value === "重要度高、緊急度高"){
     importance.value = "緊急度高"
-  }else if(importanceList.value === "緊急度高、緊急度低"){
+  }else if(importanceList.value === "重要度高、緊急度低"){
     importance.value = "緊急度中"
-  }else if(importanceList.value === "緊急度低、緊急度高"){
+  }else if(importanceList.value === "重要度低、緊急度高"){
     importance.value = "緊急度低"
-  }else if(importanceList.value === "緊急度低、緊急度低"){
+  }else if(importanceList.value === "重要度低、緊急度低"){
     importance.value = "緊急度無"
   }
   console.log(importance.value)

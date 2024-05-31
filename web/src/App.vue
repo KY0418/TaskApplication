@@ -1,7 +1,6 @@
 <template lang="pug">
 div.bod
-    section.boxCompo
-       RouterView 
+    RouterView 
 </template>
 
 <script setup lang="ts">

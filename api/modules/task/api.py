@@ -17,7 +17,7 @@ async def list_tasks(db: PostgresqlDatabase=Depends(get_db)):
     if task is None:
         raise HTTPException(status_code=404,detail="Task not found")
     task.sort()
-    return [ task_schema.Task(id=i[0],title=i[1],category=i[2],status_id=i[3],staff_id=i[4],priority_id=i[5])  for i in task]
+    return [ task_schema.Task(id=i[0],title=i[1],category=i[2],status_id=i[3],staff_id=i[4],priority_id=i[5],start_date=i[6])  for i in task]
     #return True
     #return [task_schema.Task(id=1,title="1つ目のタスク",done=False)]
 

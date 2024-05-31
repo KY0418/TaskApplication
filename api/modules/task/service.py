@@ -20,7 +20,8 @@ async def get_tasks_with_done() -> List[task_model.Task]:
                 task_model.Task.category,
                 task_model.Task.status_id,
                 task_model.Task.staff_id,   
-                task_model.Task.priority_id,   
+                task_model.Task.priority_id,
+                task_model.Task.start_date,   
             )
             .join(task_model.Done, on=(task_model.Task.id == task_model.Done.task_id),join_type=JOIN.LEFT_OUTER)
             #.objects(constructor=task_model.Task)
@@ -29,7 +30,7 @@ async def get_tasks_with_done() -> List[task_model.Task]:
     #result = list(result)
     #print(result,"9999")
     #print( [ (i.id,i.title,i.done) for i in result ])
-    return [ (i.id,i.title,i.category,i.status_id,i.staff_id,i.priority_id) for i in result ]
+    return [ (i.id,i.title,i.category,i.status_id,i.staff_id,i.priority_id,i.start_date) for i in result ]
 
 async def update_task(db:PostgresqlDatabase,task_create:task_schema.TaskCreate,
                         original:task_model.Task,task_id:int)-> task_model.Task:

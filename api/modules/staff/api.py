@@ -12,13 +12,20 @@ db = PostgresqlDatabase(config.DB,user=config.DB_USER,password=config.DB_PASS,po
 router = APIRouter()
 
 @router.get("/staffs",response_model=list[staff_schema.StaffResponse])
-async def list_staffs(db:PostgresqlDatabase=Depends(get_db)):
+async def list_staffs():
     staff = await staff_crud.get_staff()
     if staff is None:
         HTTPException(status_code=404,detail="Staff Not Exist")
     staff.sort()
     return [ staff_schema.StaffResponse(id=i[0],staff_id=i[1],staff_name=i[2])  for i in staff]
 
+@router.get("/staffs/{st_id}",response_model=list[staff_schema.StaffRequest])
+async def search_staffs(st_id:str):
+    staff = await staff_crud.search_staff(st_id)
+    if staff is None:
+        HTTPException(status_code=404,detail="Staff Not Exist")
+    staff.sort()
+    return [ staff_schema.StaffRequest(staff_name=i)  for i in staff]
 
 @router.post("/staffs",response_model=staff_schema.StaffResponse)
 async def create_staff_data(staff_data: staff_schema.StaffRequest,db:PostgresqlDatabase=Depends(get_db)):

@@ -14,6 +14,17 @@ async def get_staff() -> List[staff_schema.StaffResponse]:
     
     return [(i.id,i.staff_id,i.staff_name) for i in result]
 
+
+async def search_staff(st_id:str) -> List[staff_schema.StaffRequest]:
+    result = (task_model.Staff
+              .select(
+                  task_model.Staff.id,
+                  task_model.Staff.staff_id,
+                  task_model.Staff.staff_name
+              ).filter(task_model.Staff.staff_id == st_id ))
+
+    return [(i.staff_name) for i in result]
+
 async def regist_staff(db:PostgresqlDatabase,staff_data:staff_schema.StaffRequest) -> task_model.Staff:
     res = await get_staff()
     compList = []

@@ -3,17 +3,18 @@ import axios from 'axios'
 import { useToast } from 'vue-toast-notification'
 import { reactive, ref } from 'vue'
 
-let apiUrl = 'http://localhost:8000/tasks'
+const apiUrl = 'http://localhost:8000/tasks/'
 const toast = useToast()
 
-export const useGetTaskStore = defineStore({
-  id:'gettask',
+export const useGetStatusStore = defineStore({
+  id:'getstatus',
   state: () => ({
-    data:ref([])
+    data:ref()
   }),
 actions: {
-  async get() : Promise<void>  {
-    const response =  await axios.get(apiUrl)
+  async get(id:number) : Promise<void>  {
+    const apiurl = `${apiUrl}${id}/status`
+    const response =  await axios.get(apiurl)
     .then(response =>{
       this.$state.data =  response.data
       console.log(this.data)
@@ -23,7 +24,7 @@ actions: {
         position:"top"
       })
     })
-    
+    console.log(apiurl)
    },
   },
 })

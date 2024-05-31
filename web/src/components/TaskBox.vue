@@ -3,8 +3,8 @@ div.whole
   div.border-solid.border-red.rounded-25px.ml-4.w-70.float-left.taskBox
       p.text-red.mt-2.ml-2.w-30.tb {{ catTitle }} 
       div
-        TaskContent(v-for="item in props.responseData" v-bind:title="item.title" v-bind:status="item.status_id" :id="item.id" :category="item.category" :st_id="item.staff_id" :pri_id="item.priority_id"
-                    v-on:createTitle="changeTitle" v-on:changeState="changeStatus" v-on:changePopupStatus="changeSwitch" v-on:updateId="updateId" v-on:showtoast="showToast"
+        TaskContent(v-for="item in props.responseData" :title="item.title" :status="item.status_id" :id="item.id" :category="item.category" :st_id="item.staff_id" :pri_id="item.priority_id"
+                    :start_date="item.start_date" @:createTitle="changeTitle" v-on:changeState="changeStatus" v-on:changePopupStatus="changeSwitch" v-on:updateId="updateId" v-on:showtoast="showToast"
                     v-on:handData="getUpdFlg" v-on:delFlg="delFlgSecond")
 
 </template>
@@ -72,6 +72,7 @@ interface defData {
     category:string
     staff_id:string
     priority_id:number
+    start_date:string
   }[],
   flg:boolean
 }

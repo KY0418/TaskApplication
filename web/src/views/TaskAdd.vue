@@ -7,12 +7,27 @@ div
     div.border-solid.rounded-22px.border-gray.ml-6.mt-4.w-180
       div.tt.mt-2.mb-2
         span.pt-2.ml-2.bor タスクタイトル
-        input(type="text" name="sample" id="postdata" v-model="defData.title").ml-8.w-90.te
+        input(type="text" name="sample" id="postdata" v-model="defData.title" placeholder="タイトルを入力してください").ml-8.w-90.te
+        div.tr1
+      div.ml-2.mt-2.mb-2
+        span.block 開始日
+          select(v-model="selectDate").rounded-8px.ml-47.w-30
+            option(v-for="item in yearList" :value="item" :selected="yearList[2]" ) 
+              span {{ item }}
+          span.ml-2 年
+          select(v-model="selectMonth").ml-2
+            option(v-for="itemonth in monthList" :value="itemonth"  ) 
+              span {{ itemonth }}
+          span.ml-2 月
+          select(v-model="selectDay").ml-2
+            option(v-for="itemdate in dateList" :value="itemdate"  ) 
+              span {{ itemdate }}
+          span.ml-2 日
       div.tr1
       div.ml-2.mt-2.mb-2
         span 職員名
           select(v-model="st_name" ).cat.rounded-8px.ml-47.w-30
-            option(v-for="item in staffList" :value="item.staff_id" :selected="st_name") {{ item.staff_name }}
+            option(v-for="item in staffList" :value="item.staff_id" ) {{ item.staff_name }}
       div.tr1
       div.ml-2.mt-2.mb-2
         span カテゴリー        
@@ -25,10 +40,10 @@ div
       div.ml-2.mt-2.mb-2
         span 優先度
           select(v-model="importanceId").cat.rounded-8px.ml-47.w-30
-            option( value="1" ) 緊急度高、緊急度高
-            option( value="2" ) 緊急度高、緊急度低
-            option( value="3" ) 緊急度低、緊急度高
-            option( value="4" ) 緊急度低、緊急度低
+            option( value="1" ) 重要度高、緊急度高
+            option( value="2" ) 重要度高、緊急度低
+            option( value="3" ) 重要度低、緊急度高
+            option( value="4" ) 重要度低、緊急度低
       div.tr1
       div.ts.mt-2.mb-2
         span.mt-2.ml-2.mb-2.bor ステータス
@@ -119,6 +134,30 @@ import { useGetStaffStore } from '@/stores/getStaffData';
 import { collapseTextChangeRangesAcrossMultipleVersions, isConditionalExpression } from 'typescript';
 import type { Ref } from 'vue';
 import { usegetImportStore } from '@/stores/getImportance';
+import dayjs from 'dayjs';
+
+
+const yearList = []
+for(let i=2019; i<= 2029;i++ ){
+  yearList.push(i)
+}
+const monthList = []
+for(let i=1; i<= 12;i++ ){
+  monthList.push(i)
+}
+const selectDate = ref(2024)
+
+const selectMonth = ref(4)
+
+const selectDay = ref(1)
+
+const dateList = []
+
+const postDate = ref()
+
+for (let day = 1; day <= 31; day++) {
+  dateList.push(day)
+}
 
 const toast = useToast()
 
@@ -155,7 +194,7 @@ interface Emits {
 
 const emit = defineEmits<Emits>()
 
-const staffList = staffData.data
+const staffList = ref(staffData.data)
 
 const tList = ref([""])
 
@@ -186,7 +225,7 @@ const apiUrl = 'http://localhost:8000/tasks';
 // POSTデータ 画面のデータと連携している変数
 const defData = reactive ({
   title: ref(""),
-  id:statusNum.value
+  id:statusNum.value,
 })
 
 // POST成功時にタスク一覧画面に遷移する　失敗時はERRORトーストを表示
@@ -211,8 +250,9 @@ const getData = async () : Promise<void> => {
   console.log(importanceId.value)
   await importanceData.get(importanceId.value as number)
   impData.value = importanceData.data[0].id
+  postDate.value = String(selectDate.value)+'-'+String(selectMonth.value).padStart(2,'0')+'-'+String(selectDay.value).padStart(2,'0')
+  console.log(postDate.value)
 }
-
 // const getStatus = async (stId:number): Promise<void> => {
 //   const apiUrlStatusGet = `${apiUrl}${stId}`
 //   const response = await axios.get(apiUrlStatusGet)
@@ -231,12 +271,14 @@ const post = async () : Promise<any> => {
   // eveflgno = defData.title === "" ? true : false
   // eveflg = tList.value.includes(defData.title)
   console.log(statusNum.value)
+  if(defData.title !== ""){
     const resopnse = await axios.post(apiUrl, {
       title:defData.title,
       category:category.value,
       status_id:Number(statusNum.value),
       staff_id:st_name.value,
       priority_id:impData.value,
+      start_date:postDate.value
     })
     .then(response => {
       if (response.status === 200 || response.status === 201) {
@@ -253,13 +295,15 @@ const post = async () : Promise<any> => {
         position:"top"
       })
     })
-   
-    // succeedAddTask(eveflg)
-  // }else if(eveflg == true || eveflgno == true) {
-  //   toast.error("そのタスクは既に存在しているか、タイトルが空になっています",{
-  //     position:"top"
-  //   })
-  // }
-
+  }else{
+    toast.error("タイトルを入力してください",{
+      position:"top"
+    })
+  }
 }
+
+onMounted(async () => {
+  await staffData.get()
+  staffList.value = staffData.data
+})
 </script>

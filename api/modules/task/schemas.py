@@ -8,6 +8,7 @@ class TaskBase(BaseModel):
     status_id: int = Field(None)
     staff_id: str = Field(None)
     priority_id: int = Field(None)
+    start_date: datetime.date | str | None = Field(None)
 
 class TaskCreate(TaskBase):
     pass
