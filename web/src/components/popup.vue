@@ -111,6 +111,7 @@ interface Emits {
 	(event:"changeSwitch",flg:boolean):void
 	(event:"showtoast",msg:string,flg:number):void
 	(event:"taskstatus",status:string):void
+	(event:"updGet"):void
 }
 
 const emit = defineEmits<Emits>()
@@ -145,14 +146,10 @@ watch(TrueOrFalse,(newvalue) => {
   })
 
 const put = async () : Promise<void> => {
-console.log("111",newtitle.value == props.title && TrueOrFalse.value == props.status)
-console.log("search ",apiUrl.includes(String(props.id)))
-if(apiUrl.includes(String(props.id)) === false){
-  apiUrl = `${apiUrl}${props.id}`
-}
+let putURL = apiUrl
+putURL = `${putURL}${props.id}`
 console.log(apiUrl,"  URL TEST",props.id,"  task NUMBER")
-console.log(category.value,"val check")
-const response = await axios.put( apiUrl,{
+const response = await axios.put( putURL,{
     title: newtitle.value,
     category: category.value,
     status_id:TrueOrFalse.value,
@@ -166,6 +163,7 @@ const response = await axios.put( apiUrl,{
     emit("changetitle",newtitle.value)
     emit("changeSwitch",upflg.value)
     emit("taskstatus",taskState.value)
+    emit("updGet")
     upflg.value = !upflg.value
   })
   .catch(error => {

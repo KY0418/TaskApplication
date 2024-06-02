@@ -11,7 +11,7 @@ export const usegetImportStore = defineStore({
     id: "getimp",
     state: () => ({
         data:ref(),
-        whole_data:ref([])
+        whole_data:ref()
     }),
     actions:{
         async get(id:number): Promise<void> {

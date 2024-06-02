@@ -19,7 +19,7 @@ div.uu
             p.br.second ステータス		 
             p.br.second 優先度
             p.btn 
-        CalendarRow(v-for="day in dayList" :year="year" :month="month" :days="day" :getData="filData" :taskData="taskData")   
+        CalendarRow(v-for="day in dayList" :year="year" :month="month" :days="day" :getData="filData" :taskData="taskData" @getFlg="changeGetflg")   
 </template>
 <style lang="scss">
 ul{
@@ -95,15 +95,18 @@ import dayjs from 'dayjs';
 import { useGetStaffStore } from '@/stores/getStaffData';
 import { usegetImportStore } from '@/stores/getImportance';
 import {useGetStatusStore}  from '@/stores/getStatus';
- 
+
+const importance_store = usegetImportStore() 
 const staffStore = useGetStaffStore()
 const taskStore = useGetTaskStore()
 const importanceStore = usegetImportStore()
 const statusStore = useGetStatusStore()
-
+const getFlg = ref(false)
+const watchdata = ref(taskStore.data)
 const year = ref(dayjs().year())
 const month = ref(dayjs().month())
-const days = ref(dayjs(`${year}-${month.value + 1}`).daysInMonth())
+const DayOfWeek = ref(dayjs().day())
+const days = ref(dayjs(`${year}-${month.value+1}`).daysInMonth())
 const dayList  = ref<number[]>([])
 const date = reactive({
     nextmonth :ref(month.value+1),
@@ -175,36 +178,55 @@ interface stdata {
 const filData = ref<Record<string,string>[]>([])
 const taskData = ref<Record<string,string>[]>([])
 
+const changeGetflg = () => {
+    getFlg.value = !getFlg.value
+}
+
+const dateUpd = async(): Promise<void> =>{
+    dayList.value = []
+    year.value = dayjs().year()
+    month.value = dayjs().month()
+    days.value = dayjs(`${year}-${month.value + 1}`).daysInMonth()
+    for(let i=1;i<=days.value;i++){
+        dayList.value.push(i)
+    }
+}
+
+watch([year,month], async()=>{
+    await getData()
+})
+
 // 年月日の引数渡す
 const getData = async() => {
     await taskStore.get()
     await staffStore.get()
     const makeData = taskStore.data
+    days.value = dayjs(`${year.value}-${month.value}`).daysInMonth()
+    taskData.value = []
+    filData.value = []
+    dayList.value = []
+    for(let i=1;i<=days.value;i++){
+        dayList.value.push(i)
+    }
     const li: getdata[] = []
     for(let i of makeData){
         li.push(i)
     }
     
-    console.log(li)
-    console.log(typeof(li))
     let staffSearch: staffData[] = []
     let staffList: staffData[] = []
     staffList = staffStore.data
     const searchRes = li.filter((search)=> search.start_date.includes(String(year.value)+'-'+String(month.value).padStart(2,'0'))) 
-    console.log(typeof(searchRes[0].staff_id))
     for(let i = 0;i < searchRes.length; i++){
         let st = searchRes[0].staff_id
         staffSearch = staffList.filter((search)=> search.staff_id === searchRes[i].staff_id)
+        console.log(staffSearch[0])
         await statusStore.get(searchRes[i].status_id)
         await importanceStore.get(searchRes[i].priority_id)
         filData.value.push({'staff_name':staffSearch[0].staff_name,'start_date':searchRes[i].start_date})
-        console.log(statusStore.data[0].status_name)
         taskData.value.push({'title':searchRes[i].title,'staff_name':staffSearch[0].staff_name,'status':statusStore.data[0].status_name,'priority':importanceStore.data[0].importance,'staff_id':searchRes[i].staff_id,'start_date':searchRes[i].start_date,'id':String(searchRes[i].id)}) 
         console.log(filData.value)
     }
-    // }String(year.value)+'-'+String(month.value).padStart(2,'0')+'-'+String(1).padStart(2,'0')
-    console.log(filData.value)
-    console.log(listContent.value)
 }
 
 // 変数増やして境界値を制御できるようにする
@@ -235,7 +257,8 @@ const nextMonth = () => {
     }
 }
 
-watch([taskStore.data,staffStore.data],async()=>{
+watch(getFlg,async()=>{
+    console.log("test")
     await taskStore.get()
     await staffStore.get()
     await getData()
@@ -268,9 +291,11 @@ const beforeMonth = () => {
 }
 
 onMounted(async() => {
+    await importanceStore.get_whole()
     await taskStore.get()
     await staffStore.get()
+    await statusStore.get_whole()
+    await dateUpd()
     await getData()
-
 })
 </script>

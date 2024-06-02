@@ -55,17 +55,23 @@ button{
 <script setup lang="ts">
 import axios from 'axios';
 import { ref,watch } from 'vue';
+import {useToast} from 'vue-toast-notification';
+
+const toast = useToast()
 
 interface delData {
     id:number
     deltitle:string
 }
 
+
 interface Emits {
     (event:"delAgree"):void
     (event:"delNotAgree"):void
     (event:"delEmit",msg:string,flg:number):void
     (event:"delFlgOrigin",delflg:boolean):void
+    (event:"delflg"):void
+    (event:"calendarDelFlg"):void
 }
 const props = defineProps<delData>()
 
@@ -104,6 +110,9 @@ const response = await axios.delete(apiUrl)
       let tFlg = 0
       emit("delEmit",tsMsg.value,tFlg)
       delCompFlg.value = true
+      emit("delNotAgree")
+      emit("delflg")
+      emit("calendarDelFlg")
   }
 })
   .catch(error => {
@@ -111,6 +120,9 @@ const response = await axios.delete(apiUrl)
     let tFlg = 1
     tsMsg.value = error.response.data.detail
     emit("delEmit",tsMsg.value,tFlg)
+    toast.error(tsMsg.value,{
+        position:"top"
+    })
   })
 }
 

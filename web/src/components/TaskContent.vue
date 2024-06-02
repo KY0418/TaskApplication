@@ -16,9 +16,9 @@ div(v-if="tasktitle!==''").block.border-solid.border-white.rounded-20px.bg-white
             button(type="button" @click="DelModal").block.float-right.border-solid.border-white.rounded-5px.text-white.bg-red.text-sm.ml-4.mr-4.p-1 削除
 div(v-show="showUpd")
   popup(v-bind:title="props.title" v-bind:status="props.status" v-bind:id="props.id" v-on:changeSwitch="UpdMod" v-bind:category="props.category"
-        v-on:showtoast="CaseSuccessTsMsg" v-on:taskstatus="watchStatus" v-on:changetitle="watchTitle" :pri_id= "props.pri_id")
+        @updGet="getFlgHanding" @showtoast="CaseSuccessTsMsg" v-on:taskstatus="watchStatus" v-on:changetitle="watchTitle" :pri_id= "props.pri_id")
 div(v-show="showDel")
-  delmodal(v-on:delNotAgree="DelModal" v-on:delEmit="prcAgree" v-on:delFlgOrigin="detectDelFlg" v-bind:id="props.id" :deltitle="tasktitle") 
+  delmodal(@delNotAgree="DelModal" @delEmit="prcAgree" @delFlgOrigin="detectDelFlg" @delflg="delGetflg" :id="props.id" :deltitle="tasktitle") 
 </template>
 <style lang="scss" scoped>
 .st {
@@ -41,7 +41,6 @@ import axios, { Axios, type AxiosResponse } from 'axios'
 import { onMounted, ref, watch } from 'vue';
 import delmodal from './delmodal.vue';
 import popup from './popup.vue';
-import { useToast } from 'vue-toast-notification';
 import { useGetStaffStore } from '@/stores/getStaffData';
 import { usegetImportStore } from '@/stores/getImportance';
 import { useGetTaskStore } from '@/stores/getTask';
@@ -65,7 +64,8 @@ interface Emits {
     (evenet:"showtoast",msg:string,flg:number):void
     (event:"showDelModal"):void
     (event:"handData",flg:boolean):void
-    (event:"delFlg",delFlg:boolean):void
+    (event:"delFlg"):void
+    (event:"updFlg"):void
 }
 
 const props = defineProps<taskContentData>()
@@ -89,7 +89,6 @@ const tList = []
 const showUpd = ref(false)
 const showDel = ref(false)
 const updFlg = ref(false)
-const toast = useToast()
 const pri = ref(props.pri_id)
 const delCompFlg = ref(false)
 const updWatch = ref(false)
@@ -113,6 +112,13 @@ const determine_status = async (status:number)=>{
 
 determine_status(props.status)
 
+const delGetflg = () =>{
+  emit("delFlg")
+}
+
+const getFlgHanding = () =>{
+  emit("updFlg")
+}
 
 const p_idGet = async (id:number): Promise<void> => {
   const importanceList = ref()
@@ -142,6 +148,8 @@ watch(props,async (newvalue): Promise<void> => {
   console.log(newvalue)
 })
 
+
+
 watch([taskStatus,tasktitle],() => {
   emit("handData",updFlg.value)
   console.log("emit1",updFlg.value)
@@ -150,7 +158,7 @@ watch([taskStatus,tasktitle],() => {
 
 watch(delCompFlg,() => {
   console.log("delemit2",delCompFlg.value)
-  emit("delFlg",delCompFlg.value)
+  emit("delFlg")
   delCompFlg.value = false
 })
 
@@ -208,7 +216,7 @@ const CaseSuccessTsMsg = (msg:string,flg:number): void => {
   emit("showtoast",tsMsg.value,flg)
 }
 
-const DelModal = (): void => {
+const DelModal = () => {
   showDel.value = !showDel.value
 }
 

@@ -12,6 +12,19 @@ async def get_status(task_id: int):
     #     return None
     return [(i) for i in status_name]
 
+async def get_status_whole():
+    # status_name = task_model.Status.get_or_none(task_model.Status.id == task_id) 
+    status = (task_model.Status
+                   .select(
+                       task_model.Status.id,
+                       task_model.Status.status_name))
+    # if status_name is None: 
+    #     return None
+
+    return [(i.id,i.status_name) for i in status]
+
+
+
 
 
 

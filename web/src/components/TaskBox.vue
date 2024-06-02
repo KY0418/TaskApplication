@@ -1,11 +1,13 @@
 <template lang="pug">
 div.whole
   div.border-solid.border-red.rounded-25px.ml-4.w-70.float-left.taskBox
-      p.text-red.mt-2.ml-2.w-30.tb {{ catTitle }} 
+      p(v-show="(catListSt[0]==2 && catList[0]==='完了') || (catListSt[0]==2) || (catList[0]==='完了')").text-red.mt-2.ml-2.w-30.tb 完了 
+      p(v-show="catList[0]==='仕事' && catListSt[0]!=2").text-red.mt-2.ml-2.w-30.tb 仕事 
+      p(v-show="catList[0]==='プライベート' && catListSt[0]!=2").text-red.mt-2.ml-2.w-30.tb プライベート  
       div
         TaskContent(v-for="item in props.responseData" :title="item.title" :status="item.status_id" :id="item.id" :category="item.category" :st_id="item.staff_id" :pri_id="item.priority_id"
-                    :start_date="item.start_date" @:createTitle="changeTitle" v-on:changeState="changeStatus" v-on:changePopupStatus="changeSwitch" v-on:updateId="updateId" v-on:showtoast="showToast"
-                    v-on:handData="getUpdFlg" v-on:delFlg="delFlgSecond")
+                    :start_date="item.start_date" @updFlg="handingUpdflg" @createTitle="changeTitle" @changeState="changeStatus" @changePopupStatus="changeSwitch" @updateId="updateId" @showtoast="showToast"
+                    @handData="getUpdFlg" @delFlg="delFlgSecond")
 
 </template>
 <style lang="scss" scoped >
@@ -42,7 +44,7 @@ const tasktitle = ref("")
 const taskstatus = ref("") 
 const status = ref(false)
 // カテゴリータイトル
-const catTitle = ref('')
+const catTitle = ref<string[]>([])
 // レコードを検索するためのID
 const searchId = ref(0)
 // 編集ポップアップ表示のフラグ
@@ -79,48 +81,39 @@ interface defData {
 
 // Props受け取りデータ格納変数
 const props = defineProps<defData>()
-const catList = props.responseData.map((task) => task.category)
-const catListSt = props.responseData.map((task) => task.status_id)
-console.log(catList)
-catTitle.value = catList[0]
-if(catListSt[0] == 2){
-  catTitle.value = "完了"
+const catList = ref(props.responseData.map((task) => task.category))
+const catListSt = ref(props.responseData.map((task) => task.status_id))
+catTitle.value = catList.value
+console.log(catList.value)
+console.log(catTitle.value[0])
+if(catListSt.value[0] == 2 || catList.value[0] === "完了"){
+  catTitle.value[0] = "完了"
 }
-console.log(catTitle.value)
-// 親コンポーネントでGETが完了したかどうか監視する
-// const isFlgChanged = computed(() => props.flg);
-// console.log(props.responseData)
-// watch(isFlgChanged, () =>{
-//   const catList = props.responseData.map((task) => task.category)
-//   catTitle.value = catList[0]
-//   console.log(catTitle.value)
-  // for(const i of props.responseData){ 
-  //   if(categoryList.includes(i.category) === false){
-  //     categoryList.push(i.category)
-  //   }
-  // console.log(categoryList)
-  // console.log(props.responseData,"test")
-  // // completeTaks.value = props.responseData.filter((task) => task.category === "complete")
-  // privateTaks.value = props.responseData.filter((task) => task.category === "private")
-  // workTasks.value = props.responseData.filter((task) => task.category === "work")
-
-  // console.log(workTasks.value)
-
-  // changetitle.value = false
-  // }
-// })
 
 
 const handingData = ref(props.responseData)
 
-watch(props.responseData,(newvalue)=>{
-  handingData.value = newvalue
+const categeoryprovide = async() =>{
+  catList.value = props.responseData.map((task) => task.category)
+  catListSt.value = props.responseData.map((task) => task.status_id)
+  catTitle.value[0] = catList.value[0]
+  console.log(catList.value)
+  if(catListSt.value[0] == 2 || catList.value[0] === "完了"){
+    catTitle.value[0] = "完了"
+}
+}
+
+watch(props,async(newvalue)=>{
+  handingData.value = newvalue.responseData
+  await categeoryprovide()
   console.log("test watch")
 })
 
 interface Emits {
-  (event:"handFlg",flg:boolean):void
+  (event:"handFlg"):void
   (event:"delFlgs",delflg:boolean):void
+  (event:"delflgs"):void
+  (event:"updflg"):void
 }
 
 const emit = defineEmits<Emits>()
@@ -130,7 +123,10 @@ const getUpdFlg = (flg:boolean): void => {
   console.log("emit2 ",flg)
 }
 
-// よく分からない
+const handingUpdflg = () => {
+  emit("updflg")
+} 
+
 const value:string | null = window.localStorage.getItem('tflg')
 console.log(value)
 if(value === "success"){
@@ -141,7 +137,7 @@ if(value === "success"){
 }
 
 watch(updFlgSon,() => {
-  emit("handFlg",updFlgSon.value)
+  emit("handFlg")
   console.log("emit2")
   updFlgSon.value = false
 })
@@ -207,14 +203,14 @@ const showToastPut = (msg:string): void => {
   }
 }
 
-watch(delFlgSon,() => {
-  emit("delFlgs",delFlgSon.value)
-  console.log("delemit3",delFlgSon.value)
-  delFlgSon.value = false
-})
+// watch(delFlgSon,() => {
+//   emit("delFlgs",delFlgSon.value)
+//   console.log("delemit3",delFlgSon.value)
+//   delFlgSon.value = false
+// })
 
-const delFlgSecond = (delFlg:boolean) => {
-  delFlgSon.value = delFlg
+const delFlgSecond = () => {
+  emit("delflgs")
 }
 
 </script>

@@ -83,11 +83,17 @@ import type { responseData,eventFLG} from '@/interfaces'
 import { useToast } from 'vue-toast-notification';
 import { useGetTaskStore } from '@/stores/getTask';
 import { useGetStaffStore } from '@/stores/getStaffData';
+import { usegetImportStore } from '@/stores/getImportance';
+import { useGetStatusStore } from '@/stores/getStatus';
+
+const importanceStore = usegetImportStore()
 
 const staffStore = useGetStaffStore()
 
 const taskStore = useGetTaskStore()
 
+const statusStore = useGetStatusStore()
+console.log(statusStore.data)
 interface taskData{
         title: string,
         staff_name:string,
@@ -104,6 +110,7 @@ const newname = ref(props.staff_name)
 const priority = ref(props.priority)
 const toast = useToast()
 const upflg = ref(false)
+const impList = importanceStore.whole_data
 
 interface Emits {
 	(event:"changetitle",title:string):void
@@ -111,6 +118,7 @@ interface Emits {
 	(event:"showtoast",msg:string,flg:number):void
 	(event:"taskstatus",status:string):void
 	(event:"close"):void
+	(event:"calendarUpd"):void
 }
 
 const emit = defineEmits<Emits>()
@@ -146,24 +154,37 @@ watch(TrueOrFalse,(newvalue) => {
   })
 
 const put = async () : Promise<void> => {
-console.log("111",newtitle.value == props.title && TrueOrFalse.value == props.status)
-console.log("search ",apiUrl.includes(String(props.id)))
+let putURL = apiUrl
+putURL = `${putURL}${props.id}`
+console.log("111",props.id)
+let priority_id : number = 0
+let status_id : number = 0
+for(let i of importanceStore.whole_data){
+    if(i["importance"] == priority.value){
+      priority_id = i["id"]
+    }
+  }
+for(let i of statusStore.wholeData){
+    if(i["status_name"] == TrueOrFalse.value){
+      status_id = i["status_id"]
+    }
+  }
+
 if(oldName !== newname.value){
     await staffStore.put(props.staff_id,newname.value)
 }
 if(apiUrl.includes(String(props.id)) === false){
   apiUrl = `${apiUrl}${props.id}`
 }
-const response = await axios.put( apiUrl,{
+const response = await axios.put( putURL,{
     title: newtitle.value,
-    status_id:TrueOrFalse.value,
-    priority_id:priority.value,
+    status_id:status_id,
+    priority_id:priority_id,
   })
   .then(response => {
     tsMsg.value = "更新完了"
     tFlg = 0
     upflg.value = !upflg.value
-    emit("changetitle",newtitle.value)
     emit("close")
     emit("taskstatus",taskState.value)
     upflg.value = !upflg.value
@@ -176,6 +197,7 @@ const response = await axios.put( apiUrl,{
   })
   })
   emit("showtoast",tsMsg.value,tFlg)
+  emit("calendarUpd")
   await taskStore.get()
   }
 

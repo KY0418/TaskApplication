@@ -26,8 +26,9 @@ div
       div.tr1
       div.ml-2.mt-2.mb-2
         span 職員名
-          select(v-model="st_name" ).cat.rounded-8px.ml-47.w-30
-            option(v-for="item in staffList" :value="item.staff_id" ) {{ item.staff_name }}
+          select(v-model="name" ).cat.rounded-8px.ml-47.w-30
+            option(selected disabled) 職員を選んでください
+            option(v-for="item in staffList" :value="item.staff_id") {{ item.staff_name }}   
       div.tr1
       div.ml-2.mt-2.mb-2
         span カテゴリー        
@@ -126,13 +127,12 @@ button{
 
 <script setup lang="ts">
 import axios from 'axios'
-import { ref,reactive,onMounted} from 'vue';
+import { ref,reactive,onMounted,watch} from 'vue';
 import ToastPlugin from 'vue-toast-notification';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toast-notification';
 import { useGetStaffStore } from '@/stores/getStaffData';
 import { collapseTextChangeRangesAcrossMultipleVersions, isConditionalExpression } from 'typescript';
-import type { Ref } from 'vue';
 import { usegetImportStore } from '@/stores/getImportance';
 import dayjs from 'dayjs';
 
@@ -145,19 +145,33 @@ const monthList = []
 for(let i=1; i<= 12;i++ ){
   monthList.push(i)
 }
-const selectDate = ref(2024)
+const year = ref(dayjs().year())
+const tomonth = ref(dayjs().month())
+const today = ref(dayjs().date())
 
-const selectMonth = ref(4)
+const selectDate = ref(year.value)
 
-const selectDay = ref(1)
+const selectMonth = ref(tomonth.value+1)
 
-const dateList = []
+const selectDay = ref(today.value)
+
+const dateList = ref([])
 
 const postDate = ref()
 
-for (let day = 1; day <= 31; day++) {
-  dateList.push(day)
-}
+const days = ref(dayjs(`${selectDate.value}-${selectMonth.value }`).daysInMonth())
+  for(let day=1; day<=days.value;day++){
+    dateList.value.push(day as never)
+  }
+
+watch([selectDate,selectMonth],() =>{
+  dateList.value = []
+  const days = ref(dayjs(`${selectDate.value}-${selectMonth.value }`).daysInMonth())
+  for(let day=1; day<=days.value;day++){
+    dateList.value.push(day as never)
+  }
+})
+
 
 const toast = useToast()
 
@@ -165,7 +179,7 @@ const importanceData = usegetImportStore()
 
 const staffData = useGetStaffStore()
 
-const aaa = (): string => {
+const stGet = (): string => {
   staffData.get()
   const a = ref([])
   for(let i of staffData.$state.data){
@@ -181,12 +195,10 @@ const aaa = (): string => {
 const importanceId = ref(1)
 console.log(importanceId.value)
 // 職員の名前
-const st_name = ref("職員を選んでください")
-staffData.get()
-const test = aaa()
-st_name.value = test
+const name = ref('')
+staffData.get() 
+const test = stGet()
 
-console.log(st_name.value)
 
 interface Emits {
   (event:"toastFlg",msg:string):void
@@ -263,20 +275,15 @@ const getData = async () : Promise<void> => {
 // POST関数
 const post = async () : Promise<any> => {
   await getData()
-  console.log(tList.value)
-  console.log(defData.title)
-  console.log(st_name.value)
-  console.log(impData.value)
-  console.log(importanceId.value)
   // eveflgno = defData.title === "" ? true : false
   // eveflg = tList.value.includes(defData.title)
   console.log(statusNum.value)
-  if(defData.title !== ""){
+  if(defData.title !== "" && name.value != '職員を選んでください'){
     const resopnse = await axios.post(apiUrl, {
       title:defData.title,
       category:category.value,
       status_id:Number(statusNum.value),
-      staff_id:st_name.value,
+      staff_id:name.value,
       priority_id:impData.value,
       start_date:postDate.value
     })
@@ -296,7 +303,7 @@ const post = async () : Promise<any> => {
       })
     })
   }else{
-    toast.error("タイトルを入力してください",{
+    toast.error("入力・選択した値を確認してください",{
       position:"top"
     })
   }
@@ -305,5 +312,6 @@ const post = async () : Promise<any> => {
 onMounted(async () => {
   await staffData.get()
   staffList.value = staffData.data
+  name.value = "職員を選んでください"
 })
 </script>

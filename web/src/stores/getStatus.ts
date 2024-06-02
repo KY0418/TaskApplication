@@ -9,7 +9,8 @@ const toast = useToast()
 export const useGetStatusStore = defineStore({
   id:'getstatus',
   state: () => ({
-    data:ref()
+    data:ref(),
+    wholeData:ref([])
   }),
 actions: {
   async get(id:number) : Promise<void>  {
@@ -17,6 +18,20 @@ actions: {
     const response =  await axios.get(apiurl)
     .then(response =>{
       this.$state.data =  response.data
+      console.log(this.data)
+    }).catch(error =>{
+      let msg = "失敗"
+      toast.error(msg,{
+        position:"top"
+      })
+    })
+    console.log(apiurl)
+   },
+  async get_whole() : Promise<void>  {
+    const apiurl = `${apiUrl}status`
+    const response =  await axios.get(apiurl)
+    .then(response =>{
+      this.$state.wholeData =  response.data
       console.log(this.data)
     }).catch(error =>{
       let msg = "失敗"

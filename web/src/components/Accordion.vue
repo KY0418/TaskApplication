@@ -5,16 +5,21 @@ div.accordion-container
               td.text-center.d1  {{ props.staff_id }} 
               td.d2.text-center  {{ props.staff_name }}
               td.d3.text-center  {{ props. title}}
-              td.d4.text-center  {{ props.status }}
-              td(v-show="props.priority=='重要度高、緊急度高'").d4.text-center.bg-red.rounded-5px  {{ props.priority }}
+              td(v-show="props.status==='未着手'").d4.text-center.bg-red-2  {{ props.status }}
+              td(v-show="props.status==='完了'").d4.text-center.bg-blue-5  {{ props.status }}
+              td(v-show="props.status==='進行中'").d4.text-center.bg-yellow-1  {{ props.status }}
+              td(v-show="props.priority=='重要度高、緊急度高'").d4.text-center.bg-red  {{ props.priority }}
+              td(v-show="props.priority=='重要度高、緊急度低'").d4.text-center.bg-yellow  {{ props.priority }}
+              td(v-show="props.priority=='重要度低、緊急度高'").d4.text-center.bg-blue  {{ props.priority }}
+              td(v-show="props.priority=='重要度低、緊急度低'").d4.text-center.bg-gray  {{ props.priority }}
               td.btnw 
                 div.text-center.flex 
                   button(type="button" @click="updFlgControll").ml-2.mr-1.bg-green-3.border-white.rounded-5px 編集
                   button(type="button" @click="delFlgControll" ).bg-red-4.border-white.rounded-5px 削除
 div(v-show="updModFlg")
-  CalendarUpdModal(@close="updFlgControll" :title="props.title" :staff_name="props.staff_name" :status="props.status" :priority="props.priority" :id="Number(props.id)" :staff_id="props.staff_id")
+  CalendarUpdModal(@close="updFlgControll" @calendarUpd="retGetflg" :title="props.title" :staff_name="props.staff_name" :status="props.status" :priority="props.priority" :id="Number(props.id)" :staff_id="props.staff_id")
 div(v-show="delModFlg")
-  delmodal(@delNotAgree="delFlgControll")
+  delmodal(@delNotAgree="delFlgControll" @calendarDelFlg="retGetflg" :id="Number(props.id)" :deltitle="props.title")
 </template>
 <style lang="scss" scoped>
 td{
@@ -95,10 +100,11 @@ table{
 </style>
 <script setup lang="ts">
 import delmodal from './delmodal.vue';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import CalendarUpdModal from './CalendarUpdModal.vue';
  
 
+ 
 const updModFlg = ref(false)
 const delModFlg = ref(false)
 const delFlgControll = () => {
@@ -108,6 +114,10 @@ const delFlgControll = () => {
 const updFlgControll = () => {
   updModFlg.value = !updModFlg.value
 }
+interface Emits{
+  (event:"getflg"):void
+}
+
 
 interface taskData{
         title: string,
@@ -120,4 +130,9 @@ interface taskData{
     }
 
 const props = defineProps<taskData>()
+const emit = defineEmits<Emits>()
+
+const retGetflg = () => {
+  emit("getflg")
+}
 </script>

@@ -10,6 +10,12 @@ class TaskBase(BaseModel):
     priority_id: int = Field(None)
     start_date: datetime.date | str | None = Field(None)
 
+class TaskUpdate(BaseModel):
+    title : str = Field(None)
+    # due_date: datetime.date | str | None  = Field(None)
+    status_id: int = Field(None)
+    priority_id: int = Field(None)
+
 class TaskCreate(TaskBase):
     pass
 

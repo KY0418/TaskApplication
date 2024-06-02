@@ -1,15 +1,25 @@
 <template lang="pug">
 div.listyle  
     li.l
-        span.block.text-center {{String(props.days).padStart(2,'0')}}
+        span(v-show="dayOfweek==0").block.text-center.bg-pink-3 {{String(props.days).padStart(2,'0')}}
+        span(v-show="dayOfweek==6").block.text-center.bg-blue {{String(props.days).padStart(2,'0')}}
+        span(v-show="dayOfweek!=6 & dayOfweek!=0").block.text-center {{String(props.days).padStart(2,'0')}}
+
         div.block.debu
-            p(v-for="item of nameList" @click="openAccordionMenu" id="dataRow").inline.ml-4.bg-yellow-1 ▼ {{ item }}
+            span(v-show="isToday").dow.ml-2.bg-green.rounded-5px {{ indicateDay }}
+            span(v-show="isToday==false").dow.ml-2 {{ indicateDay }}
+            div().inline
+                p(v-for="item of nameList" @click="openAccordionMenu" id="dataRow").inline.ml-4 ▼ {{ item.staff_name }}
             div(v-show="menuFlg")
-                accordion(v-for="item of taskData" :title="item.title" :status="item.status" :staff_name="item.staff_name" :priority="item.priority" :staff_id="item.staff_id" :id="item.id" :start_date="item.start_date")
-
-
+                accordion(v-for="item of taskData" :title="item.title" :status="item.status" :staff_name="item.staff_name" :priority="item.priority" :staff_id="item.staff_id" :id="item.id" :start_date="item.start_date"
+                            @getflg="cruckGet")
 </template>
 <style lang="scss" scoped>
+@import url('https://fonts.googleapis.com/css2?family=Sacramento&display=swap');
+span{
+    font-family: 'Sacramento', cursive;
+}
+
  .debu{
     width:100%;
     border-left: solid 1px black;
@@ -43,6 +53,9 @@ p{
 import { ref,watch } from 'vue';
 import { useGetStaffStore } from '@/stores/getStaffData';
 import accordion from './Accordion.vue';
+import dayjs from 'dayjs';
+
+
 
 const staffStore = useGetStaffStore()
 
@@ -57,8 +70,8 @@ interface CalendarData {
         id:string
     }[],
     getData:{
-        staff_name:string | null,
-        start_date:string | null,
+        staff_name:string,
+        start_date:string,
     }[],
     year: number,
     month: number,
@@ -90,33 +103,92 @@ interface tData {
         priority: string,
         staff_id: string,
 }
+interface Emits{
+    (event:"getFlg"):void
+}
 const listContent = ref<listContentOrg[]>([])
+const emit = defineEmits<Emits>()
 const props = defineProps<CalendarData>()
+const compareDate = ref(dayjs().format('YYYY-MM-DD'));
+const compareDateProp = ref(dayjs(`${props.year}-${props.month}-${props.days}`).format('YYYY-MM-DD'));
+const isToday = ref(compareDate.value === compareDateProp.value)
+console.log(isToday.value)
 let gcount = ref(0)
 let swap = 0
 const gdata = ref<getdata[]>(props.getData)
 const nameList = ref<getdata[]>([])
-const matchData = ref<search[]>([])
+const matchData = ref<string[]>([])
 const menuFlg = ref(false)
-const res :getdata[] = []
+const res = ref<getdata[]>([])
 const taskData = ref<tData[]>()
+const  date = ref(String(props.year)+"/"+String(props.month)+"/"+String(props.days))
+const dayOfweek = ref(dayjs(date.value).day())
+const indicateDay = ref()
+console.log(props.days)
+console.log(dayOfweek.value)
+// const rowContent = async() =>  {
+//     let swap = ref<string>()
+//     taskData.value = props.taskData.filter((search)=> search.start_date ===  String(props.year)+'-'+String(props.month).padStart(2,'0')+'-'+String(props.days).padStart(2,'0'))
+//     const res = ref<getdata[] | null>([]) 
+//     res.value = gdata.value.filter((search)=> search.start_date === String(props.year)+'-'+String(props.month).padStart(2,'0')+'-'+String(props.days).padStart(2,'0'))
+//     console.log(res.value)
+//     if(gdata.value.length >= 2 && gdata.value != undefined && res.value != undefined){
+//         console.log(res.value)
+//         for(let i:number = 0;i<gdata.value.length;i++){
+//             swap.value = res.value[i].staff_name
+//             if(nameList.value.includes(gdata.value[i].staff_name) == false){
+//                 console.log(res.value[i])
+//                 nameList.value.push(swap.value)
+//             }
+//         }
+//     }else if(gdata.value.length <= 1 && gdata.value != undefined && res.value != undefined){
+//         if(nameList.value.includes(gdata.value[0].staff_name) == false)
+//             nameList.value.push(res.value[0].staff_name)
+//     }
+// }
+const cruckGet = () => {
+    emit("getFlg")
+}
+
 const rowContent = async() =>  {
-    taskData.value = props.taskData.filter((search)=> search.start_date ===  String(props.year)+'-'+String(props.month).padStart(2,'0')+'-'+String(props.days).padStart(2,'0'))
-    const res = ref<getdata[] | null>([]) 
-    res.value = gdata.value.filter((search)=> search.start_date === String(props.year)+'-'+String(props.month).padStart(2,'0')+'-'+String(props.days).padStart(2,'0'))
-    console.log(res)
-    if(gdata.value.length >= 2 && gdata.value != undefined){
-        for(let i:number = 0;i<gdata.value.length;i++){
-            if(nameList.value.includes(gdata.value[i].staff_name) == false){
-                console.log(res.value[i])
-                nameList.value.push(res.value[i].staff_name)
-            }
+    await indicateDayCompute()
+    const formattedDate = `${props.year}-${String(props.month).padStart(2, '0')}-${String(props.days).padStart(2, '0')}`;
+    taskData.value = props.taskData.filter(task => task.start_date === formattedDate);
+    const res = gdata.value.filter(data => data.start_date === formattedDate);
+    nameList.value = [];
+    res.forEach(data => {
+        if (data.staff_name && !nameList.value.some(item => item.staff_name === data.staff_name)) {
+            nameList.value.push({ staff_name: data.staff_name, start_date: data.start_date });
         }
-    }else if(gdata.value.length <= 1){
-        nameList.value.push(gdata.value[0]?.staff_name)
+    });
+}
+
+const indicateDayCompute = async() => {
+    switch(dayOfweek.value){
+        case 0:
+            indicateDay.value = "Sun"
+            break
+        case 1:
+            indicateDay.value = "Mon"
+            break
+        case 2:
+            indicateDay.value = "Tue"
+            break
+        case 3:
+            indicateDay.value = "Wed"
+            break
+        case 4:
+            indicateDay.value = "Thu"
+            break
+        case 5:
+            indicateDay.value = "Fri"
+            break
+        case 6:
+            indicateDay.value = "Sat"
+            break
     }
 }
-rowContent()
+
 console.log(props.taskData)
 // const searchData = async() => {
 //     listContent.value = []
@@ -144,9 +216,12 @@ const openAccordionMenu = ()  => {
 }
 watch(props,async()=> {
     // await searchData()
+    date.value = String(props.year)+"/"+String(props.month)+"/"+String(props.days)
+    dayOfweek.value = dayjs(date.value).day()
     gdata.value = props.getData
-    nameList.value = <string[]>([])
     await rowContent()
+    compareDateProp.value = dayjs(`${props.year}-${props.month}-${props.days}`).format('YYYY-MM-DD')
+    isToday.value = compareDate.value === compareDateProp.value
 })
 // String(parseInt(Object.values(i)[0],10)).padStart(2,'0')
 </script>  

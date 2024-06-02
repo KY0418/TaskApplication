@@ -38,15 +38,10 @@ async def update_task(task_id:int,task_body: task_schema.TaskCreate,db: Postgres
     print("1111")
     # ID検索結果のタイトルを格納している
     task = await task_crud.get_task(task_id=task_id)
-    # title = task_body.title
-    # done = task_body.done
-    print(task_id)
-    # for i in task: 
-    #     if i[1] == title and i[2] == done:
-    #         raise HTTPException(status_code=409,detail="Conflict")
+    task_check = await task_crud.get_tasks_with_done()
     if task is None:
         print("111")
-        raise HTTPException(status_code=404,detail="Task not found")
+        raise HTTPException(status_code=404,detail="Task not Found")
     return await task_crud.update_task(db,task_body,original=task,task_id=task_id)
 
 @router.delete("/tasks/{task_id}", response_model=None)

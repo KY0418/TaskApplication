@@ -7,7 +7,7 @@ div.boxtitle
           router-link(:to="{name:'calender'}").text-xl.mt-2.text-white.mr-4.home カレンダー
 router-link(:to="{name:'taskadd'}" v-on:toastFlg="showToastPost").add.block.mt-4.ml-4.mb-4.bg-blue.text-xl.text-white.border-solid.border-white.rounded-10px.text-center ＋タスクを追加
 div
-  TaskBox(v-for="item in workListTr" :responseData="item" :flg="tList" v-on:handFlg="updFlgParent" v-on:delFlgs="delFlgParent")
+  TaskBox(v-for="item in workListTr" :responseData="item" :flg="tList"  v-on:delFlgs="delFlgParent" @delflgs="delFlgParent" @updflg="watchUpdFlg")
 </template>
 <style lang="scss" scoped>
 
@@ -87,7 +87,6 @@ const updFlgParent = (flg:boolean): void => {
 
 // GETで最新のデータを取得する
 const initializeGettitle = async (): Promise<void> => {
-  console.log(get_task.data)
   globalList.value = get_task.$state.data
   console.log(globalList.value)
   completeTasks.value = globalList.value.filter((task) => task["category"] === "完了" || task["status_id"] == 2)
@@ -97,7 +96,6 @@ const initializeGettitle = async (): Promise<void> => {
   workTasks.value = globalList.value.filter((task) => task["category"] === "仕事" && task["status_id"] != 2)
   workTasks.value.sort((a,b)=>a["priority_id"]-b["priority_id"])
   const workList = ref([])
-  console.log("test")
   if(workTasks.value.length > 0){
       workList.value.push(workTasks.value as never)
   }
@@ -117,6 +115,10 @@ watch(get_task.data,async() => {
   console.log("watch test")
 })
 
+const watchUpdFlg = async() =>{
+  updFlg.value = !updFlg.value
+}
+
 // updateフラグ変数の監視
 watch(updFlg, async (newvalue) => {
   console.log(newvalue)
@@ -126,7 +128,6 @@ watch(updFlg, async (newvalue) => {
   await initializeGettitle() 
   console.log(get_task.data)
   console.log("emit Complete")
-  showToast("更新完了")
   updFlg.value = false
 })
 
@@ -147,8 +148,8 @@ const showToastPost = (msg: string): void => {
   })
 }
 
-const delFlgParent = (flg:boolean) => {
-  delFlg.value = flg
+const delFlgParent = () => {
+  delFlg.value = !delFlg.value
 }
 
 // interface componentPublicinstance {
