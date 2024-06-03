@@ -42,6 +42,9 @@ async def update_task(task_id:int,task_body: task_schema.TaskCreate,db: Postgres
     if task is None:
         print("111")
         raise HTTPException(status_code=404,detail="Task not Found")
+    for i in task_check:
+        if i[1] == task_body.title:   
+            raise HTTPException(status_code=409,detail="Conflict")  
     return await task_crud.update_task(db,task_body,original=task,task_id=task_id)
 
 @router.delete("/tasks/{task_id}", response_model=None)

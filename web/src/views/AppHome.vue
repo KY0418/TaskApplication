@@ -88,7 +88,6 @@ const updFlgParent = (flg:boolean): void => {
 // GETで最新のデータを取得する
 const initializeGettitle = async (): Promise<void> => {
   globalList.value = get_task.$state.data
-  console.log(globalList.value)
   completeTasks.value = globalList.value.filter((task) => task["category"] === "完了" || task["status_id"] == 2)
   completeTasks.value.sort((a,b)=>a["priority_id"]-b["priority_id"])
   privateTasks.value = globalList.value.filter((task) => task["category"] === "プライベート" && task["status_id"] != 2)
@@ -126,14 +125,11 @@ watch(updFlg, async (newvalue) => {
   await get_staff.get()
   await get_task.get()
   await initializeGettitle() 
-  console.log(get_task.data)
-  console.log("emit Complete")
   updFlg.value = false
 })
 
 // deleteフラグ変数の監視
 watch(delFlg,async (newvalue) => {
-    console.log("delemit complete")
     await get_staff.get()
     await get_task.get()
     await initializeGettitle()
@@ -152,21 +148,10 @@ const delFlgParent = () => {
   delFlg.value = !delFlg.value
 }
 
-// interface componentPublicinstance {
-//   $options: ComponentOptions
-// }
-
-// const methodThatForcesUpdate = () => {
-//   const instance = getCurrentInstance();
-//   instance.proxy.$forceUpdate()
-//   console.log("test force")
-// };
-
 onMounted(async() => {
       await get_staff.get()
       await get_task.get()
       await importance_store.get_whole()
-      console.log("test2222")
       await initializeGettitle()
     }) 
 </script>

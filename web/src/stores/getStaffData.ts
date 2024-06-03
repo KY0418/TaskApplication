@@ -34,10 +34,7 @@ actions: {
     console.log(this.$state.getflg)
     const response =  await axios.get(apiUrlSt as string)
     .then(response =>{
-      const swap = ref([])
-      swap.value  = response.data
       this.$state.data = response.data
-      console.log(response.data)
     }).catch(error =>{
       let msg = error.response.data.detaile
     })
@@ -49,7 +46,6 @@ actions: {
     const response =  await axios.get(apiURL as string)
     .then(response =>{
       this.$state.search_data = response.data
-      console.log(response.data)
     }).catch(error =>{
       console.log("failed to get request")
     })
@@ -65,7 +61,6 @@ actions: {
         })
       this.$state.getflg++
       this.$state.postflg = true
-      console.log(this.$state.getflg)
       }
     })
     .catch(error => {

@@ -1,8 +1,8 @@
 <template lang="pug">
 div.whole
   div.border-solid.border-red.rounded-25px.ml-4.w-70.float-left.taskBox
-      p(v-show="(catListSt[0]==2 && catList[0]==='完了') || (catListSt[0]==2) || (catList[0]==='完了')").text-red.mt-2.ml-2.w-30.tb 完了 
-      p(v-show="catList[0]==='仕事' && catListSt[0]!=2").text-red.mt-2.ml-2.w-30.tb 仕事 
+      p(v-show="(catListSt[0]==2 && catList[0]==='完了') || (catListSt[0]==2) || (catList[0]==='完了')").text-red.mt-2.ml-2.w-15.tb 完了 
+      p(v-show="catList[0]==='仕事' && catListSt[0]!=2").text-red.mt-2.ml-2.w-15.tb 仕事 
       p(v-show="catList[0]==='プライベート' && catListSt[0]!=2").text-red.mt-2.ml-2.w-30.tb プライベート  
       div
         TaskContent(v-for="item in props.responseData" :title="item.title" :status="item.status_id" :id="item.id" :category="item.category" :st_id="item.staff_id" :pri_id="item.priority_id"
@@ -84,8 +84,6 @@ const props = defineProps<defData>()
 const catList = ref(props.responseData.map((task) => task.category))
 const catListSt = ref(props.responseData.map((task) => task.status_id))
 catTitle.value = catList.value
-console.log(catList.value)
-console.log(catTitle.value[0])
 if(catListSt.value[0] == 2 || catList.value[0] === "完了"){
   catTitle.value[0] = "完了"
 }
@@ -97,7 +95,6 @@ const categeoryprovide = async() =>{
   catList.value = props.responseData.map((task) => task.category)
   catListSt.value = props.responseData.map((task) => task.status_id)
   catTitle.value[0] = catList.value[0]
-  console.log(catList.value)
   if(catListSt.value[0] == 2 || catList.value[0] === "完了"){
     catTitle.value[0] = "完了"
 }
@@ -106,7 +103,6 @@ const categeoryprovide = async() =>{
 watch(props,async(newvalue)=>{
   handingData.value = newvalue.responseData
   await categeoryprovide()
-  console.log("test watch")
 })
 
 interface Emits {
@@ -120,7 +116,6 @@ const emit = defineEmits<Emits>()
 
 const getUpdFlg = (flg:boolean): void => {
   updFlgSon.value = flg
-  console.log("emit2 ",flg)
 }
 
 const handingUpdflg = () => {
@@ -128,7 +123,6 @@ const handingUpdflg = () => {
 } 
 
 const value:string | null = window.localStorage.getItem('tflg')
-console.log(value)
 if(value === "success"){
   toast.success("登録成功",{
     position:"top"
@@ -138,7 +132,6 @@ if(value === "success"){
 
 watch(updFlgSon,() => {
   emit("handFlg")
-  console.log("emit2")
   updFlgSon.value = false
 })
 
@@ -156,9 +149,7 @@ const showToastPost = (msg: string): void => {
 
 // 以下の5つの関数はemitで受け取った値を処理する
 const changeTitle = (newTitle:string): void => {
-  console.log(newTitle)
   tasktitle.value = newTitle
-  console.log(tasktitle.value)
 }
 
 const changeStatus = (newstatus: boolean) : void => {
@@ -171,7 +162,6 @@ const changeSwitch = (): void => {
 
 const updateId = (newid: number): void => {
   searchId.value = newid
-  console.log(searchId.value)
 }
 
 const showToast = (msg:string,flg:number): void => {
@@ -203,11 +193,6 @@ const showToastPut = (msg:string): void => {
   }
 }
 
-// watch(delFlgSon,() => {
-//   emit("delFlgs",delFlgSon.value)
-//   console.log("delemit3",delFlgSon.value)
-//   delFlgSon.value = false
-// })
 
 const delFlgSecond = () => {
   emit("delflgs")

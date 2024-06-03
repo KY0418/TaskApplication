@@ -1,7 +1,7 @@
 from fastapi import FastAPI 
-from modules.status import RouterStatus
+from modules.status import api as stateapi
 from modules.task import api
-from modules.done import RouterDone
+from modules.done import api as dapi
 from modules.staff import api as stapi
 from modules.importance import api as imapi
 from fastapi.middleware.cors import CORSMiddleware
@@ -21,9 +21,9 @@ app.add_middleware(
 
 app.include_router(api.router)
 
-app.include_router(RouterDone.router)
+app.include_router(dapi.router)
 
-app.include_router(RouterStatus.router)
+app.include_router(stateapi.router)
 
 app.include_router(stapi.router)
 

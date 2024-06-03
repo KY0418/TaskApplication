@@ -164,6 +164,7 @@ const response = await axios.put( putURL,{
     emit("changeSwitch",upflg.value)
     emit("taskstatus",taskState.value)
     emit("updGet")
+    emit("showtoast",tsMsg.value,tFlg)
     upflg.value = !upflg.value
   })
   .catch(error => {
@@ -173,7 +174,6 @@ const response = await axios.put( putURL,{
     position:"top"
   })
   })
-  emit("showtoast",tsMsg.value,tFlg)
   await taskStore.get()
   }
 

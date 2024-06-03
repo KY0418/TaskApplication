@@ -112,7 +112,6 @@ const props = defineProps<CalendarData>()
 const compareDate = ref(dayjs().format('YYYY-MM-DD'));
 const compareDateProp = ref(dayjs(`${props.year}-${props.month}-${props.days}`).format('YYYY-MM-DD'));
 const isToday = ref(compareDate.value === compareDateProp.value)
-console.log(isToday.value)
 let gcount = ref(0)
 let swap = 0
 const gdata = ref<getdata[]>(props.getData)
@@ -124,8 +123,6 @@ const taskData = ref<tData[]>()
 const  date = ref(String(props.year)+"/"+String(props.month)+"/"+String(props.days))
 const dayOfweek = ref(dayjs(date.value).day())
 const indicateDay = ref()
-console.log(props.days)
-console.log(dayOfweek.value)
 // const rowContent = async() =>  {
 //     let swap = ref<string>()
 //     taskData.value = props.taskData.filter((search)=> search.start_date ===  String(props.year)+'-'+String(props.month).padStart(2,'0')+'-'+String(props.days).padStart(2,'0'))
@@ -189,7 +186,6 @@ const indicateDayCompute = async() => {
     }
 }
 
-console.log(props.taskData)
 // const searchData = async() => {
 //     listContent.value = []
 //     pdata.value = props.dateData.filter((search)=> search.year == props.year)

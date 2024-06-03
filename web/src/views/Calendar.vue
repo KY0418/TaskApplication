@@ -119,10 +119,7 @@ for(let i=1;i<=days.value;i++){
     dayList.value.push(i)
 }
 
-console.log(days.value)
-console.log(dayList)
 const listContent = ref([])
-console.log(year)
 let yearCalendarTrue = ref([])
 // const makeCalData = () =>{
 //     const startYear = dayjs().year()-5
@@ -212,7 +209,6 @@ const getData = async() => {
     for(let i of makeData){
         li.push(i)
     }
-    
     let staffSearch: staffData[] = []
     let staffList: staffData[] = []
     staffList = staffStore.data
@@ -231,6 +227,9 @@ const getData = async() => {
 
 // 変数増やして境界値を制御できるようにする
 const nextMonth = () => {
+    if(date.nextyear==2029 && date.nextmonth == 12){
+        return 
+    }
     if(date.nextmonth == 12){
         date.nextyear += 1
         date.nextmonth = 1
@@ -251,6 +250,7 @@ const nextMonth = () => {
     }else{
         date.beforemonth += 1
     }
+    
     days.value = dayjs(`${year}-${month.value + 1}`).daysInMonth()
     for(let i=1;i<=days.value;i++){
         dayList.value.push(i)
@@ -269,6 +269,9 @@ watch(getFlg,async()=>{
 // })
 
 const beforeMonth = () => {
+    if(date.beforeyear == 2019 && date.beforemonth == 1){
+        return
+    }
     if(date.nextmonth == 1){
         date.nextyear -= 1
         date.nextmonth = 12
@@ -288,6 +291,7 @@ const beforeMonth = () => {
     }else{
         date.beforemonth -= 1
     }
+    
 }
 
 onMounted(async() => {

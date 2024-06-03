@@ -1,0 +1,31 @@
+tasks table
+    id : serial PrimaryKey=True null=False 
+    title : Char max_length=1024
+    category : Char null=False
+    status_id : Integer null=False
+    staff_id : Char null=False
+    priority_id : Integer null=False
+    start_date : Date null=False formats=['%Y-%m-%d'] 
+
+status table
+    id : serial PrimaryKey=True null=False 
+    status_name : Char null=False unique=True
+
+Insert Data For SQL
+
+INSERT INTO priority (status_name) 
+values ('未着手','完了','進行中');
+
+staff table
+    id : serial PrimaryKey=True null=False
+    staff_id : Char null=False max_length=6 
+    staff_name : Char null=False
+
+priority table
+    id : serial PrimaryKey=True null=False
+    importance : Char null=False
+
+    Insert Data For SQL
+
+    INSERT INTO priority (importance) 
+    values ('重要度高、緊急度高','重要度高、緊急度低','重要度低、緊急度高','重要度低、緊急度低');

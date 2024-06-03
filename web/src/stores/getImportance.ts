@@ -5,7 +5,7 @@ import { ReactiveEffect, reactive, ref} from 'vue'
 
 const toast = useToast()
 
-const apiUrl = 'http://localhost:8000/importance/'
+const apiUrl = 'http://localhost:8000/importance'
 
 export const usegetImportStore = defineStore({
     id: "getimp",
@@ -15,7 +15,7 @@ export const usegetImportStore = defineStore({
     }),
     actions:{
         async get(id:number): Promise<void> {
-            let apiurl = `${apiUrl}${id}`
+            let apiurl = `${apiUrl}/${id}`
             const response = await axios.get(apiurl)
             .then(response => {
                 if(response.status == 200 || response.status == 201){

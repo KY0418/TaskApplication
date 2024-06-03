@@ -39,11 +39,12 @@ div {
 <script setup lang="ts">
 import axios, { Axios, type AxiosResponse } from 'axios'
 import { onMounted, ref, watch } from 'vue';
-import delmodal from './delmodal.vue';
-import popup from './popup.vue';
+import delmodal from './GlbDelModal.vue';
+import popup from './TaskUpdModal.vue';
 import { useGetStaffStore } from '@/stores/getStaffData';
 import { usegetImportStore } from '@/stores/getImportance';
 import { useGetTaskStore } from '@/stores/getTask';
+
 
 
 interface taskContentData {
@@ -124,11 +125,10 @@ const p_idGet = async (id:number): Promise<void> => {
   const importanceList = ref()
   for(let i of importance_store.whole_data){
     if(i["id"] == id){
-      console.log(i["id"])
       importanceList.value = i["importance"]
     }
   }
-  console.log(importanceList.value)
+
   if(importanceList.value === "重要度高、緊急度高"){
     importance.value = "緊急度高"
   }else if(importanceList.value === "重要度高、緊急度低"){
@@ -138,33 +138,28 @@ const p_idGet = async (id:number): Promise<void> => {
   }else if(importanceList.value === "重要度低、緊急度低"){
     importance.value = "緊急度無"
   }
-  console.log(importance.value)
 }
 p_idGet(props.pri_id)
 watch(props,async (newvalue): Promise<void> => {
   tasktitle.value = newvalue.title
   await p_idGet(newvalue.pri_id)
   await determine_status(newvalue.status)
-  console.log(newvalue)
 })
 
 
 
 watch([taskStatus,tasktitle],() => {
   emit("handData",updFlg.value)
-  console.log("emit1",updFlg.value)
   updFlg.value = false
 })
 
 watch(delCompFlg,() => {
-  console.log("delemit2",delCompFlg.value)
   emit("delFlg")
   delCompFlg.value = false
 })
 
 watch(updWatch,() => {
   emit("handData",updFlg.value)
-  console.log("emit1",updFlg.value)
   updFlg.value = false
 })
 

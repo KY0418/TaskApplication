@@ -10,7 +10,8 @@ div.sample-popup-window
                   input(type="text" v-model="newtitle" ).w-60.tt
               label.block.mt-4.ml-4 職員名
                 div.mt-4.ml-10
-                  input(type="text" v-model="newname" ).w-60.tt
+                  select(v-model="newname")
+                    option(v-for="item of staffList" :value="item.staff_name").w-60.tt {{ item.staff_name }}
               label.block.mt-4.ml-4.mr-4.mb-6 優先度
                 div.ml-10.mt-4
                   select(v-model="priority").tt
@@ -102,6 +103,7 @@ interface taskData{
         staff_id:string,
         id:number,
 }
+const staffList = ref(staffStore.data)
 const props = defineProps<taskData>()
 const TrueOrFalse = ref(props.status)
 const oldName = props.staff_name
@@ -153,12 +155,17 @@ watch(TrueOrFalse,(newvalue) => {
     }
   })
 
+watch(props,()=>{
+  staffList.value = staffStore.data
+})
+
 const put = async () : Promise<void> => {
 let putURL = apiUrl
 putURL = `${putURL}${props.id}`
 console.log("111",props.id)
 let priority_id : number = 0
 let status_id : number = 0
+let staff_id :string = ""
 for(let i of importanceStore.whole_data){
     if(i["importance"] == priority.value){
       priority_id = i["id"]
@@ -169,16 +176,19 @@ for(let i of statusStore.wholeData){
       status_id = i["status_id"]
     }
   }
-
-if(oldName !== newname.value){
-    await staffStore.put(props.staff_id,newname.value)
-}
+for(let i of staffStore.data){
+    if(i["staff_name"] === newname.value){
+      staff_id = i["staff_id"]
+    }
+  }
+  console.log(staff_id)
 if(apiUrl.includes(String(props.id)) === false){
   apiUrl = `${apiUrl}${props.id}`
 }
 const response = await axios.put( putURL,{
     title: newtitle.value,
     status_id:status_id,
+    staff_id: staff_id,
     priority_id:priority_id,
   })
   .then(response => {
@@ -188,6 +198,10 @@ const response = await axios.put( putURL,{
     emit("close")
     emit("taskstatus",taskState.value)
     upflg.value = !upflg.value
+    toast.success(tsMsg.value,{
+      position:"top"
+    }
+    )
   })
   .catch(error => {
     tFlg = 1
@@ -203,7 +217,7 @@ const response = await axios.put( putURL,{
 
 const popupClose = (): void => {
 	emit("changeSwitch",upflg.value)	
-    emit("close")
+  emit("close")
 
 }
 </script>

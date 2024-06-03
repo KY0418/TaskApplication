@@ -99,7 +99,7 @@ table{
 }
 </style>
 <script setup lang="ts">
-import delmodal from './delmodal.vue';
+import delmodal from './GlbDelModal.vue';
 import { ref, watch } from 'vue';
 import CalendarUpdModal from './CalendarUpdModal.vue';
  

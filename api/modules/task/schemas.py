@@ -15,6 +15,7 @@ class TaskUpdate(BaseModel):
     # due_date: datetime.date | str | None  = Field(None)
     status_id: int = Field(None)
     priority_id: int = Field(None)
+    staff_id: str = Field(None)
 
 class TaskCreate(TaskBase):
     pass
