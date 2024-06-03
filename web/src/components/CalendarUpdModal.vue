@@ -7,11 +7,11 @@ div.sample-popup-window
               h2.text-white.text-2xl.bg-blue.text-center.poptitle タスクを編集
               label.block.mt-4.ml-4 タスクタイトル
                 div.mt-4.ml-10
-                  input(type="text" v-model="newtitle" ).w-60.tt
+                  input(type="text" v-model="newtitle" ).tt
               label.block.mt-4.ml-4 職員名
                 div.mt-4.ml-10
-                  select(v-model="newname")
-                    option(v-for="item of staffList" :value="item.staff_name").w-60.tt {{ item.staff_name }}
+                  select(v-model="newname").tt
+                    option(v-for="item of staffList" :value="item.staff_name") {{ item.staff_name }}
               label.block.mt-4.ml-4.mr-4.mb-6 優先度
                 div.ml-10.mt-4
                   select(v-model="priority").tt
@@ -162,7 +162,7 @@ watch(props,()=>{
 const put = async () : Promise<void> => {
 let putURL = apiUrl
 putURL = `${putURL}${props.id}`
-console.log("111",props.id)
+console.log(putURL)
 let priority_id : number = 0
 let status_id : number = 0
 let staff_id :string = ""
@@ -197,6 +197,8 @@ const response = await axios.put( putURL,{
     upflg.value = !upflg.value
     emit("close")
     emit("taskstatus",taskState.value)
+    
+    emit("calendarUpd")
     upflg.value = !upflg.value
     toast.success(tsMsg.value,{
       position:"top"
@@ -211,7 +213,6 @@ const response = await axios.put( putURL,{
   })
   })
   emit("showtoast",tsMsg.value,tFlg)
-  emit("calendarUpd")
   await taskStore.get()
   }
 

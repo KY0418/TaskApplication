@@ -43,7 +43,9 @@ async def update_task(task_id:int,task_body: task_schema.TaskCreate,db: Postgres
         print("111")
         raise HTTPException(status_code=404,detail="Task not Found")
     for i in task_check:
-        if i[1] == task_body.title:   
+        if i[1] == task_body.title and (i[3] !=task_body.status_id or i[4] != task_body.staff_id or i[5] != task_body.priority_id):
+            break
+        elif i[1] == task_body.title:   
             raise HTTPException(status_code=409,detail="Conflict")  
     return await task_crud.update_task(db,task_body,original=task,task_id=task_id)
 

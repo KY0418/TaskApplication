@@ -3,7 +3,7 @@ div.boxtitle
     h1.prose.text-3xl タスク管理システム
       router-link(:to="{name:'apphome'}").text-xl.mt-2.float-right.text-black.home Home
 div
-  p.mt-5.ml-5.text-xl タスク追加
+  p.mt-5.ml-5.text-xl.text-left タスク追加
     div.border-solid.rounded-22px.border-gray.ml-6.mt-4.w-180
       div.tt.mt-2.mb-2
         span.pt-2.ml-2.bor タスクタイトル
@@ -97,14 +97,6 @@ h1 {
   border-color: rgb(9, 85, 151);
 }
 
-// .te::before{
-//   content: "";
-//   width:1px;
-//   height: 5px;
-//   border-right-style: solid;
-//   border-color: rgb(9, 85, 151);
-// }
-
 button{
   margin-left: 27%;
 }
@@ -114,11 +106,6 @@ button{
   border-right-style: solid;
   
 }
-
-// .bor{
-//   display:inline;
-//   border-right-style:solid;
-// }
 
 .te:focus {
   background-color: white;
@@ -252,7 +239,7 @@ const impData = ref()
 const getData = async () : Promise<void> => {
   const response = await axios.get(apiUrl)
   const titleList = response.data
-  console.log(titleList)
+
   for(const title of titleList){
     tList.value.push(title.title)
     tList.value = tList.value.filter((title) =>  title !== "")
