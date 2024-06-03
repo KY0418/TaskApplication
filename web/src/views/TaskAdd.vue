@@ -1,7 +1,4 @@
 <template lang="pug">
-div.boxtitle
-    h1.prose.text-3xl タスク管理システム
-      router-link(:to="{name:'apphome'}").text-xl.mt-2.float-right.text-black.home Home
 div
   p.mt-5.ml-5.text-xl.text-left タスク追加
     div.border-solid.rounded-22px.border-gray.ml-6.mt-4.w-180

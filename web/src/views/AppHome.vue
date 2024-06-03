@@ -1,10 +1,10 @@
 <template lang="pug">
-div.boxtitle
-    h1.prose.text-3xl タスク管理システム
-      div.float-right
-          router-link(:to="{name:'apphome'}").text-xl.mt-2.text-white.mr-4.home Home
-          router-link(:to="{name:'managementstaff'}").text-xl.mt-2.mr-2.text-white.home 職員一覧
-          router-link(:to="{name:'calender'}").text-xl.mt-2.text-white.mr-4.home カレンダー
+//- div.boxtitle
+//-     h1.prose.text-3xl タスク管理システム
+//-       div.float-right
+//-           router-link(:to="{name:'apphome'}").text-xl.mt-2.text-white.mr-4.home Home
+//-           router-link(:to="{name:'managementstaff'}").text-xl.mt-2.mr-2.text-white.home 職員一覧
+//-           router-link(:to="{name:'calender'}").text-xl.mt-2.text-white.mr-4.home カレンダー
 router-link(:to="{name:'taskadd'}" v-on:toastFlg="showToastPost").add.block.mt-4.ml-4.mb-4.bg-blue.text-xl.text-white.border-solid.border-white.rounded-10px.text-center ＋タスクを追加
 div
   TaskBox(v-for="item in workListTr" :responseData="item" :flg="tList"  v-on:delFlgs="delFlgParent" @delflgs="delFlgParent" @updflg="watchUpdFlg")

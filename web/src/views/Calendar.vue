@@ -1,10 +1,4 @@
 <template lang="pug">
-div.boxtitle
-    h1.prose.text-3xl タスク管理システム
-      div.float-right
-          router-link(:to="{name:'apphome'}").text-xl.mt-2.text-white.mr-4.home Home
-          router-link(:to="{name:'managementstaff'}").text-xl.mt-2.mr-2.text-white.home 職員一覧
-          router-link(:to="{name:'calender'}").text-xl.mt-2.text-white.mr-4.home カレンダー
 div.uu
     h2.text-center.mt-5 {{ year }} 年 {{ month }} 月
     div.mb-4

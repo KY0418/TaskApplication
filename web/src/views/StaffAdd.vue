@@ -1,9 +1,4 @@
 <template lang="pug">
-div.boxtitle
-    h1.prose.text-3xl タスク管理システム
-      div.float-right
-        router-link(:to="{name:'apphome'}").text-xl.mt-2.text-white.mr-4.home Home
-        router-link(:to="{name:'managementstaff'}").text-xl.mt-2.mr-2.text-white.home 職員一覧
 div
   h2.mt-4.ml-2.text-2xl 職員追加
   p.text-2xl.mt-4.ml-4 職員名

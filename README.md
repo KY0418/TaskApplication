@@ -2,36 +2,34 @@
  
  以下のコマンドでpyproject.tomlを作成
 
---poetry init
+- cd api
+- poetry install
 
 2.web環境の構築
 
-2-1.webプロジェクトフォルダ内で以下のコマンドを実行し、必要なオプションを追加
+webプロジェクトフォルダ内で以下のコマンドを実行し、必要なオプションを追加
 
---npm install vue@latest
-
-2-2.必要なパッケージのインストール
-
---npm install pug-plugin
-
---npm install scss
-
---npm install unocss
+- cd web
+- npm install 
 
 3.コンテナのbuild
 
---docker compose build
+- docker compose build
 
-4.データベースマイグレーション
+4.開発サーバの起動
 
---docker compose exec -it api python db_migrate_db
+- docker compose up
+
+起動確認　
+    web　http://localhost:3000
+    api  http://localhost:8000
+
+5.データベースマイグレーション
+
+- docker compose exec -it api python db_migrate_db
 
 上記コマンドでマイグレーションが実行されない場合は、bashで以下のコマンドを実行
 
---python migrate_db.py
-
-5.開発サーバの起動
-
---docker compose up
+- python migrate_db.py
 
 

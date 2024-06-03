@@ -1,25 +1,7 @@
 <template lang="pug">
-div.boxtitle 
-  h1.prope.text-3xl タスク管理システム
-    router-link(:to="{name:'apphome'}").text-xl.mt-2.float-right.text-white.home Home
 p.mt-4.ml-4.text-2xl 職員一覧
     router-link(:to="{name:'staffadd'}").border-solid.border-white.rounded-10px.bg-blue-8.p-1.text-xl.text-white.addst 職員を追加
     StaffTable(@updflg="changeFlg" :flg="changeGetFlg" )
-    //- table.border-solid.border-black.rounded-5.ml-6.mt-4 
-    //-     tr.border-solid
-    //-         th.text-center.t1 職員No
-    //-         th.text-center.t2 職員名
-    //-         th.exclude
-    //-     tr(v-for="i in stData")
-    //-         td.text-center.d1   {{ i.staff_id }}           
-    //-         td.d2
-    //-             p.text-center {{ i.staff_name }}
-    //-         td.btnw
-    //-             div.text-center 
-    //-                 button(type="button" @click="showUpdModal").float-left.ml-4.mr-4.bg-green-3.border-white.rounded-5px 編集
-    //-                 button(type="button" ).float-right.mr-4.bg-red-4.border-white.rounded-5px 削除
-//- div       
-//-     StaffUpdModal(v-show="showUpd" @close="showUpdModal" @updAgree="")
 
 </template>
 
