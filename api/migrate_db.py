@@ -1,5 +1,9 @@
 from peewee import PostgresqlDatabase
-from modules.task.models import Priority, Status,Task,Done,Staff
+from modules.task.models import Task
+from modules.status.models import Status
+from modules.staff.models import Staff
+from modules.importance.models import Priority
+from modules.done.models import Done
 import config
 
 #from api.models.task import BaseModel

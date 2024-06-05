@@ -13,43 +13,43 @@ div(v-show="delShow")
 </template>
 <style lang="scss" scoped>
 tr {
-    width:80%;
+  width: 80%;
 }
 .d1 {
-    width:20%;
+  width: 20%;
 }
 
-.d1,.d2 {
-    border-top: solid 1px black;
-    border-right: solid 1px black;
+.d1,
+.d2 {
+  border-top: solid 1px black;
+  border-right: solid 1px black;
 }
 
-.btnw{
-    border-top: solid 1px black;
-    width: 20%;
+.btnw {
+  border-top: solid 1px black;
+  width: 20%;
 }
 </style>
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import StaffUpdModal from './StaffUpdModal.vue';
-import StaffDelModal from './StaffDelModal.vue'
-import { useGetStaffStore } from '@/stores/getStaffData';
+import { ref, watch } from 'vue'
+import StaffUpdModal from '../Staff/StaffUpdModal.vue'
+import StaffDelModal from '../Staff/StaffDelModal.vue'
+import { useGetStaffStore } from '@/stores/getStaffData'
 
 const store = useGetStaffStore()
 
 interface RowData {
-    name: string,
-    st_id:string,
+  name: string
+  st_id: string
 }
 
 const delShow = ref(false)
 
 const props = defineProps<RowData>()
 
-
 interface Emits {
-    (event:"putAgree",name:string,id:string):void
-    (event:"delAgree",id:string):void
+  (event: 'putAgree', name: string, id: string): void
+  (event: 'delAgree', id: string): void
 }
 
 const emit = defineEmits<Emits>()
@@ -58,33 +58,28 @@ const st_name = ref(props.name)
 
 const st_id = ref(props.st_id)
 
-const showUpd  = ref(false)
+const showUpd = ref(false)
 
-console.log(props.name)
-
-watch(props,(newvalue)=>{
-    st_id.value = newvalue.st_id
-    st_name.value = newvalue.name
+watch(props, (newvalue) => {
+  st_id.value = newvalue.st_id
+  st_name.value = newvalue.name
 })
 
 const showUpdModal = (): void => {
-    showUpd.value = !showUpd.value
+  showUpd.value = !showUpd.value
 }
 
 const showDelModal = (): void => {
-    delShow.value = !delShow.value
-    
+  delShow.value = !delShow.value
 }
 
-const put = async(name:string,id:string): Promise<void> => {
-    showUpdModal()
-    console.log(store.data)
-    emit("putAgree",name,id)
+const put = async (name: string, id: string): Promise<void> => {
+  showUpdModal()
+  emit('putAgree', name, id)
 }
 
-const delt = (id:string) => {
-    showDelModal()
-    emit("delAgree",id)
+const delt = (id: string) => {
+  showDelModal()
+  emit('delAgree', id)
 }
-
 </script>

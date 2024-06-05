@@ -2,7 +2,7 @@
 from fastapi import APIRouter,Depends,HTTPException
 import modules.importance.schemas as importance_schema
 import modules.importance.service as importance_crud
-import modules.task.models as task_model
+import modules.importance.models as importance_model
 from db import get_db
 from peewee import PostgresqlDatabase
 import config

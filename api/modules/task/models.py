@@ -1,7 +1,4 @@
-from cgitb import text
-from email.policy import default
-from enum import unique
-from peewee import AutoField,CharField,BooleanField,ForeignKeyField,IntegerField,PrimaryKeyField,TextField,DateField
+from peewee import CharField,IntegerField,PrimaryKeyField,TextField,DateField
 from db import Base
 
 class Task(Base):
@@ -16,31 +13,6 @@ class Task(Base):
     start_date = DateField(null=False,formats=['%Y-%m-%d'])
     class Meta:
         table_name = "tasks"
-
-class Done(Base):
-    task_id = ForeignKeyField(model=Task,primary_key=True,field=Task.id,backref="tasks")
-    class Meta:
-        table_name = "dones"
-
-class Status(Base):
-    id = PrimaryKeyField(primary_key=True,unique=True)
-    status_name = TextField(null=False,unique=True)
-    class Meta:
-        table_name = "status"
-
-class Staff(Base):
-    id = PrimaryKeyField(null=False,primary_key=True,unique=True)
-    staff_id = CharField(null=False,max_length=6)
-    staff_name = TextField(null=False)
-    class Meta:
-        table_name = "staff"
-
-class Priority(Base):
-    id = PrimaryKeyField(null=False)
-    importance = TextField(null=False)
-    class Meta:
-        table_name = "priority"
-
 
 
         

@@ -12,8 +12,7 @@ services:
     environment:
       - WATCHFILES_FORCE_POLLING=true
     tty: true
-    #entrypoint: ["bash"]
-    
+
   postgresql:
     image: postgres:14
     container_name: postgres_re
@@ -24,7 +23,7 @@ services:
       TZ: Asia/Tokyo
     volumes:
       - postgres_data:/var/lib/postgres
-      
+
     ports:
       - 5432:5432
 

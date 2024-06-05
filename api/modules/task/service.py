@@ -1,5 +1,6 @@
 from peewee import PostgresqlDatabase,DoesNotExist,JOIN
 import modules.task.models as task_model
+import modules.done.models as done_model
 import modules.task.schemas as task_schema
 from typing import List
 
@@ -11,7 +12,6 @@ async def create_task(db:PostgresqlDatabase,task_create:
     return task
 
 async def get_tasks_with_done() -> List[task_model.Task]:
-    print(task_model.Task.id)
     result = (task_model.Task
              .select(
                 task_model.Task.id,
@@ -22,7 +22,7 @@ async def get_tasks_with_done() -> List[task_model.Task]:
                 task_model.Task.priority_id,
                 task_model.Task.start_date,   
             )
-            .join(task_model.Done, on=(task_model.Task.id == task_model.Done.task_id),join_type=JOIN.LEFT_OUTER)
+            .join(done_model.Done, on=(task_model.Task.id == done_model.Done.task_id),join_type=JOIN.LEFT_OUTER)
             .group_by(task_model.Task.id)
     )
     return [ (i.id,i.title,i.category,i.status_id,i.staff_id,i.priority_id,i.start_date) for i in result ]
@@ -41,7 +41,6 @@ async def update_task(db:PostgresqlDatabase,task_create:task_schema.TaskCreate,
 async def get_task(task_id:int) -> List[task_model.Task] | None:
     result = (task_model.Task.
               select(task_model.Task.title,).filter(task_model.Task.id == task_id))
-    print([ (i.title) for i in result ])
     return [ (i.title) for i in result ]
 
 async def delete_task(db: PostgresqlDatabase,original: int) -> None:
