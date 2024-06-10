@@ -13,7 +13,7 @@ div.accordion-container
               td(v-show="props.priority=='重要度低、緊急度高'").d4.text-center.bg-blue  {{ props.priority }}
               td(v-show="props.priority=='重要度低、緊急度低'").d4.text-center.bg-gray  {{ props.priority }}
               td.btnw 
-                div.text-center.flex 
+                div.flex.justify-around 
                   button(type="button" @click="updFlgControll").ml-2.mr-1.bg-green-3.border-white.rounded-5px 編集
                   button(type="button" @click="delFlgControll" ).bg-red-4.border-white.rounded-5px 削除
 div(v-show="updModFlg")
@@ -67,7 +67,7 @@ tr {
 }
 .btnw {
   border-top: solid 1px black;
-  width: 5%;
+  width: 15%;
 }
 
 table {

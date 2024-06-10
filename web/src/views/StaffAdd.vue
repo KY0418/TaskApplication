@@ -4,8 +4,8 @@ div
   p.text-2xl.mt-4.ml-4.text-left 職員名
     ul.ml-4.mt-2.border-solid.border-gray.rounded-1px 
       li 
-        input(type="text" v-model="newStaff").w-200.rounded-10px
-  button(type="button" @click="post").mt-4.bg-blue4.p-1.rounded-10px ＋職員を追加
+        input(type="text" v-model="newStaff").w-180.rounded-10px
+  button(type="button" @click="post").mt-4.bg-blue-4.p-1.rounded-10px +職員を追加
 
 </template>
 <style lang="scss" scoped>

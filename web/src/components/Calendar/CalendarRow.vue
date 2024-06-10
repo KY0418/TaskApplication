@@ -108,6 +108,7 @@ const taskData = ref<tData[]>()
 const date = ref(String(props.year) + '/' + String(props.month) + '/' + String(props.days))
 const dayOfweek = ref(dayjs(date.value).day())
 const indicateDay = ref()
+// 修正前コード
 // const rowContent = async() =>  {
 //     let swap = ref<string>()
 //     taskData.value = props.taskData.filter((search)=> search.start_date ===  String(props.year)+'-'+String(props.month).padStart(2,'0')+'-'+String(props.days).padStart(2,'0'))

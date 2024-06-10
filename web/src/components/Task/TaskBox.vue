@@ -2,7 +2,7 @@
 div.whole
   div.border-solid.border-red.rounded-25px.ml-4.w-70.float-left.taskBox
       p(v-if="categoryText").text-red.mt-2.ml-2.w-30.tb {{ categoryText }}
-      div
+      div.content
         TaskContent(v-for="item in props.responseData" :title="item.title" :status="item.status_id" :id="item.id" :category="item.category" :st_id="item.staff_id" :pri_id="item.priority_id"
                     :start_date="item.start_date" @updFlg="handingUpdflg" @createTitle="changeTitle" @changeState="changeStatus" @changePopupStatus="changeSwitch" @updateId="updateId" @showtoast="showToast"
                     @handData="getUpdFlg" @delFlg="delFlgSecond")
@@ -26,18 +26,23 @@ input {
   text-decoration: none;
   width: 15%;
 }
+
+.content {
+  width: 100%;
+}
+
+.whole {
+  width: 100%;
+}
 </style>
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import TaskContent from './TaskContent.vue'
 import { useToast } from 'vue-toast-notification'
-import { useGetTaskStore } from '@/stores/getTask'
 
-const task_store = useGetTaskStore()
 // 検索対象のタイトル
 const tasktitle = ref('')
 // タスクのステータス
-const taskstatus = ref('')
 const status = ref(false)
 // カテゴリータイトル
 const catTitle = ref<string[]>([])
@@ -49,18 +54,6 @@ let show = ref(false)
 const toast = useToast()
 // updateフラグ
 const updFlgSon = ref(false)
-// deleteフラグ
-const delFlgSon = ref(false)
-// カテゴリーごとのタスクを検索するための配列
-const categoryList = ['']
-const getFlg = ref(false)
-//　フラグ（名前変える）
-let changetitle = ref(false)
-const completeTaks = ref({})
-// カテゴリーがプライベートのタスクを格納
-const privateTaks = ref({})
-// カテゴリーが仕事のタスクを格納
-const workTasks = ref({})
 // Propsデータを受け取るためのinterface
 interface defData {
   responseData: {
@@ -131,9 +124,6 @@ watch(updFlgSon, () => {
   emit('handFlg')
   updFlgSon.value = false
 })
-
-// リクエスト先のURL
-let apiUrl = 'http://localhost:8000/tasks/'
 
 // タスク追加のトースト表示
 const showToastPost = (msg: string): void => {

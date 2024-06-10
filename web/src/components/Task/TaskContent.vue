@@ -1,17 +1,17 @@
 <template lang="pug">
-div(v-if="tasktitle!==''").block.border-solid.border-white.rounded-20px.bg-white.m-3.p-3
-    ul 
-        li(v-if="taskStatus !== ''" :class="taskStatusClass").border-solid.border-white.rounded-8px.text-white.p-1.text-xs.float-left.st {{ taskStatus }}
-        span.ml-1.text-3.titletag {{ st_name }} 
-        span(v-show="props.pri_id == 1").ml-4.bg-red-5.boder-solid.rounded-5px.text-3.imptag {{ importance  }}
-        span(v-show="props.pri_id == 2").ml-4.bg-yellow-5.boder-solid.rounded-5px.text-3.imptag {{ importance }}
-        span(v-show="props.pri_id == 3").ml-4.bg-blue-5.boder-solid.rounded-5px.text-3.imptag {{ importance }}
-        span(v-show="props.pri_id == 4").ml-4.bg-gray-5.boder-solid.rounded-5px.text-3.imptag {{ importance }}
-        li.block.mt-2.mb-2 {{ tasktitle }}
-        li.text-xs.color-gray {{ props.start_date }}
-        li
-            button(type="button" @click="UpdMod").border-solid.border-white.rounded-5px.text-white.bg-green.text-sm.ml-28.p-1 編集
-            button(type="button" @click="DelModal").block.float-right.border-solid.border-white.rounded-5px.text-white.bg-red.text-sm.ml-4.mr-4.p-1 削除
+div(v-if="tasktitle!==''").block.border-solid.border-white.rounded-20px.bg-white.m-3.p-3.content
+    ul
+      li(v-if="taskStatus !== ''" :class="taskStatusClass").border-solid.border-white.rounded-8px.float-left.text-white.p-1.text-xs.st {{ taskStatus }}
+      span.ml-1.text-3.titletag {{ st_name }} 
+      span(v-show="props.pri_id == 1").ml-4.bg-red-5.boder-solid.rounded-5px.text-3.mr-a.imptag {{ importance  }}
+      span(v-show="props.pri_id == 2").ml-4.bg-yellow-5.boder-solid.rounded-5px.text-3.imptag {{ importance }}
+      span(v-show="props.pri_id == 3").ml-4.bg-blue-5.boder-solid.rounded-5px.text-3.imptag {{ importance }}
+      span(v-show="props.pri_id == 4").ml-4.bg-gray-5.boder-solid.rounded-5px.text-3.imptag {{ importance }}
+      li.block.mt-2.mb-2 {{ tasktitle }}
+      li.text-xs.color-gray {{ props.start_date }}
+      li
+        button(type="button" @click="UpdMod").border-solid.border-white.rounded-5px.text-white.bg-green.text-sm.ml-28.p-1 編集
+        button(type="button" @click="DelModal").block.float-right.border-solid.border-white.rounded-5px.text-white.bg-red.text-sm.ml-4.mr-4.p-1 削除
 div(v-show="showUpd")
   popup(:title="props.title" :status="props.status" :id="props.id" @changeSwitch="UpdMod" :category="props.category" :st_id="props.st_id"
         :start_date="props.start_date" @updGet="getFlgHanding" @showtoast="CaseSuccessTsMsg" v-on:taskstatus="watchStatus" v-on:changetitle="watchTitle" :pri_id= "props.pri_id")
@@ -19,18 +19,31 @@ div(v-show="showDel")
   delmodal(@delNotAgreeTask="DelModal" @delEmit="prcAgree" @delFlgOrigin="detectDelFlg" @delflg="delGetflg" :id="props.id" :deltitle="tasktitle") 
 </template>
 <style lang="scss" scoped>
+div {
+  position: relative;
+}
+
+ul {
+  width: 100%;
+}
 .st {
   width: 18%;
   text-align: center;
 }
-div {
-  min-width: 50%;
-}
-.imp {
-  padding: 1px;
-}
+// div {
+//   width: 100%;
+// }
+
 .titletag {
   width: 10%;
+}
+
+.imptag {
+  width: 60px;
+  position: absolute;
+  text-align: center;
+  right: 15px;
+  top: 15px;
 }
 </style>
 
@@ -68,31 +81,18 @@ interface Emits {
 const props = defineProps<taskContentData>()
 
 const emit = defineEmits<Emits>()
-const taskStore = useGetTaskStore()
 console.log(props)
 const importance_store = usegetImportStore()
-const emList: string[] = [
-  '重要度高、緊急度高',
-  '重要度高、緊急度低',
-  '重要度低、緊急度高',
-  '重要度低、緊急度低'
-]
-const p_id = ref(props.pri_id)
 const importance = ref()
-const swap = ref(props)
-// API側のタスクステータス
-const status = ref()
 // Web側のタスクステータス表示
 const taskStatus = ref('')
 // タスクのタイトル
 const tasktitle = ref(props.title)
 const tsMsg = ref('')
-const gid = ref(props.id)
 const tList = []
 const showUpd = ref(false)
 const showDel = ref(false)
 const updFlg = ref(false)
-const pri = ref(props.pri_id)
 const delCompFlg = ref(false)
 const updWatch = ref(false)
 const st_name = ref('')

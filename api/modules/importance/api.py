@@ -5,7 +5,7 @@ import modules.importance.service as importance_crud
 import modules.importance.models as importance_model
 from db import get_db
 from peewee import PostgresqlDatabase
-import config
+import config as config
 
 db = PostgresqlDatabase(config.DB,user=config.DB_USER,password=config.DB_PASS,port=int(config.DB_PORT),host=config.DB_HOST)
 

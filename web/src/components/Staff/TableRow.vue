@@ -3,9 +3,9 @@ tr
     td.text-center.d1 {{ st_id }}       
     td.d2.text-center {{ st_name }}
     td.btnw
-        div.text-center 
-            button(type="button" @click="showUpdModal").float-left.ml-4.mr-4.bg-green-3.border-white.rounded-5px 編集
-            button(type="button" @click="showDelModal").float-right.mr-4.bg-red-4.border-white.rounded-5px 削除
+        div.flex.justify-around 
+            button(type="button" @click="showUpdModal").ml-4.mr-4.bg-green-3.border-white.rounded-5px 編集
+            button(type="button" @click="showDelModal").mr-4.bg-red-4.border-white.rounded-5px 削除
 div(v-show="showUpd")
     StaffUpdModal(@close="showUpdModal" @updAgree="put" @delclose="showUpdModal" :name="st_name" :id="st_id")
 div(v-show="delShow")
@@ -34,9 +34,6 @@ tr {
 import { ref, watch } from 'vue'
 import StaffUpdModal from '../Staff/StaffUpdModal.vue'
 import StaffDelModal from '../Staff/StaffDelModal.vue'
-import { useGetStaffStore } from '@/stores/getStaffData'
-
-const store = useGetStaffStore()
 
 interface RowData {
   name: string

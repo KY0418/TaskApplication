@@ -88,16 +88,13 @@ import { useGetStaffStore } from '@/stores/getStaffData'
 import { usegetImportStore } from '@/stores/getImportance'
 import { useGetStatusStore } from '@/stores/getStatus'
 
-const importance_store = usegetImportStore()
 const staffStore = useGetStaffStore()
 const taskStore = useGetTaskStore()
 const importanceStore = usegetImportStore()
 const statusStore = useGetStatusStore()
 const getFlg = ref(false)
-const watchdata = ref(taskStore.data)
 const year = ref(dayjs().year())
 const month = ref(dayjs().month() + 1)
-const DayOfWeek = ref(dayjs().day())
 const days = ref(dayjs(`${year}-${month.value + 1}`).daysInMonth())
 const dayList = ref<number[]>([])
 console.log(month.value)

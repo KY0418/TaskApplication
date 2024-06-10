@@ -172,9 +172,6 @@ const dateCheck = async () => {
   compare.push(datea, dateb)
   compare.sort((a, b) => a.getTime() - b.getTime())
   let idx = compare.indexOf(dateb)
-  // console.log(idx)
-  // console.log(oldStatus.value)
-  // console.log(datea,dateb)
   if (props.start_date == nowDate) {
     dateFlg.value = true
     return

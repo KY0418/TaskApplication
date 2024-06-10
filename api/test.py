@@ -2,8 +2,8 @@ from peewee import *
 # from pydantic import BaseModel
 # import cruds.task as task_crud
 # from typing  import List,Union
-# from fastapi import APIRouter,Depends
-# from db import get_db
+# from fastapi import Router,Depends
+# from .db import get_db
 # import schemas.task as task_schema
 engine= PostgresqlDatabase("task_data",user="kaneko",password="goldsilver",host="postgresql",port=5432)
 

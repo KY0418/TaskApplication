@@ -1,5 +1,5 @@
 from peewee import PostgresqlDatabase,Model
-import config
+import config as config
 
 db = PostgresqlDatabase(config.DB,user=config.DB_USER,password=config.DB_PASS,port=config.DB_PORT,host=config.DB_HOST)
 

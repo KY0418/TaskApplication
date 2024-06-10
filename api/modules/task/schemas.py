@@ -2,13 +2,13 @@ from pydantic import BaseModel,Field
 import datetime
 
 class TaskBase(BaseModel):
-    title : str | None = Field(None)
+    title : str = Field(None)
     # due_date: datetime.date | str | None  = Field(None)
     category: str = Field(None)
     status_id: int = Field(None)
     staff_id: str = Field(None)
     priority_id: int = Field(None)
-    start_date: datetime.date | str | None = Field(None)
+    start_date: datetime.date | str  = Field(None)
 
 class TaskUpdate(BaseModel):
     title : str = Field(None)
@@ -21,7 +21,7 @@ class TaskCreate(TaskBase):
     pass
 
 class TaskCreateResponse(TaskCreate):
-    id: int
+    id: int | None
 
     class ConfigDict:
         from_attributes = True

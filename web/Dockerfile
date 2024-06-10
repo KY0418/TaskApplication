@@ -11,6 +11,7 @@ WORKDIR /app
 # ENTRYPOINT ["npm", "run", "dev"]
 
 RUN apt-get update -qq && yarn global add @vue/cli
+RUN npm install -g yarn
 
 
 COPY .. :

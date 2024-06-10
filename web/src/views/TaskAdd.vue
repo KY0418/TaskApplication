@@ -51,7 +51,7 @@ div
           input(type="radio" v-model="statusNum" value="3" data-cy="proc")
           span 進行中
 div.ml-120
-    button(type="button" @click="post").border-solid.rounded-10px.border-white.text-white.text-xl.mt-2.p-1.bg-blue-8 +タスクを追加   
+    button(type="button" @click="post" data-cy="post").border-solid.rounded-10px.border-white.text-white.text-xl.mt-2.p-1.bg-blue-8 +タスクを追加   
 </template>
 
 <style lang="scss" scoped>

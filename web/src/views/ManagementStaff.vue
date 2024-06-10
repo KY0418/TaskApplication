@@ -1,5 +1,5 @@
 <template lang="pug">
-p.mt-4.ml-4.text-2xl 職員一覧
+p.mt-4.ml-4.text-2xl.align-left 職員一覧
     router-link(:to="{name:'staffadd'}").border-solid.border-white.rounded-10px.bg-blue-8.p-1.text-xl.text-white.addst 職員を追加
     StaffTable(@updflg="changeFlg" :flg="changeGetFlg" )
 

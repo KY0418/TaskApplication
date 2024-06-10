@@ -29,7 +29,7 @@ div.modal
   z-index: 1100;
   background: #fff;
   // padding: 2%;
-  height: 40%;
+  height: 35%;
   width: 40%;
   top: 50%;
   left: 50%;
