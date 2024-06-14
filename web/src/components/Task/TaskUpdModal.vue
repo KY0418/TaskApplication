@@ -131,7 +131,7 @@ const emit = defineEmits<Emits>()
 let gid: number
 let recid: number
 const tsMsg = ref('')
-let apiUrl = 'http://localhost:8000/tasks/'
+let apiUrl = import.meta.env.VITE_TASK_URL
 const tList = ref([''])
 const taskState = ref('')
 const category = ref(props.category)
@@ -237,7 +237,7 @@ const put = async (): Promise<void> => {
     return
   }
   let putURL = apiUrl
-  putURL = `${putURL}${props.id}`
+  putURL = `${putURL}/${props.id}`
   const response = await axios
     .put(putURL, {
       title: newtitle.value,
