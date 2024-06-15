@@ -1,0 +1,50 @@
+services:
+  api:
+    container_name: taskapi_re
+    build:
+      context: ./api
+      # dockerfile: ./api/Dockerfile
+    volumes:
+      - .dockerenv:/src/.venv
+      - .:/src
+    ports:
+      - 8000:8000
+    environment:
+      - WATCHFILES_FORCE_POLLING=true
+    tty: true
+
+  postgresql:
+    image: postgres:14
+    container_name: postgres_re
+    environment:
+      POSTGRES_DB: task_data
+      POSTGRES_USER: kaneko
+      POSTGRES_PASSWORD: goldsilver
+      TZ: Asia/Tokyo
+    volumes:
+      - postgres_data:/var/lib/postgres
+
+    ports:
+      - 5432:5432
+
+  web:
+    container_name: front
+    build:
+      context: .
+      dockerfile: ./web/Dockerfile
+    volumes:
+      - ./web:/app
+      # - dev-vol:/web/task-vue
+    ports:
+      - 3000:3000
+    environment:
+      - NODE_ENV=development
+    tty: true
+
+volumes:
+  dockerenv:
+    driver: local
+  postgres_data:
+    driver: local
+  frontend:
+    driver: local
