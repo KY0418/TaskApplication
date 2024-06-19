@@ -176,6 +176,7 @@ const getData = async () => {
       staff_name: staffSearch[0].staff_name,
       start_date: searchRes[i].start_date
     })
+    console.log(statusStore.data)
     taskData.value.push({
       title: searchRes[i].title,
       staff_name: staffSearch[0].staff_name,

@@ -14,7 +14,7 @@ status table
 Insert Data For SQL
 
     1.
-    INSERT INTO priority (status_name) 
+    INSERT INTO status (status_name) 
     values ('未着手','進行中');
 
 staff table
