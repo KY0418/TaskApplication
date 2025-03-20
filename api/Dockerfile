@@ -2,7 +2,7 @@ FROM python:3.11-buster
 
 ENV PYTHONUNBUFFERED=1
 
-WORKDIR /src/api
+WORKDIR /src
 
 RUN pip install poetry
 
