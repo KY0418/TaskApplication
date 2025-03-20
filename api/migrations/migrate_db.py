@@ -29,6 +29,8 @@ def cli(common: bool, tbl_name: Optional[str], trigger: bool, truncate: bool):
                 if tbl_name is not None: 
                     if module_name == tbl_name:
                         file_path = os.path.join(fpath,file_name)
+                    else:
+                        continue
                 else:
                     file_path = os.path.join(fpath,file_name)
                 with db.atomic():
