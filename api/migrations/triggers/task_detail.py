@@ -5,14 +5,14 @@ def migrate_up():
     CREATE OR REPLACE FUNCTION set_created_at()
       RETURNS TRIGGER AS $$
       BEGIN 
-      NEW.created_at := NOW();
+        NEW.created_at := NOW();
       END;
       $$ LANGUAGE plpgsql;
 
     CREATE OR REPLACE FUNCTION set_updated_at()
       RETURNS TRIGGER AS $$
       BEGIN 
-      NEW.modified_at := NOW();
+        NEW.modified_at := NOW();
       END;
       $$ LANGUAGE plpgsql;
 
