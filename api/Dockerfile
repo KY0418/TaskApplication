@@ -15,3 +15,4 @@ RUN if [ -f pyproject.toml ]; then poetry install --no-root; fi
 
 ENTRYPOINT [ "poetry", "run","uvicorn", "main:app","--host","0.0.0.0","--reload"]
 
+# RUN tail /dev/null
