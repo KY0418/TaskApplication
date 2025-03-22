@@ -7,6 +7,8 @@ services:
     volumes:
       - .dockerenv:/src/.venv
       - ./api:/src
+    expose:
+      - 8000
     ports:
       - 8000:8000
     environment:
@@ -35,6 +37,8 @@ services:
     volumes:
       - ./web:/app
       # - dev-vol:/web/task-vue
+    expose:
+      - 3000
     ports:
       - 3000:3000
     environment:
