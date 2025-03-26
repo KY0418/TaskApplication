@@ -14,10 +14,12 @@ db = PostgresqlDatabase(
     host=config.DB_HOST,
 )
 
-router = APIRouter()
+router = APIRouter(
+    prefix='/tasks',
+)
 
 
-@router.get("/tasks", response_model=list[task_schema.Task])
+@router.get("", response_model=list[task_schema.Task])
 async def list_tasks(db: PostgresqlDatabase = Depends(get_db)):
     task = await task_crud.get_tasks_with_done()
     if task is None:
@@ -37,7 +39,7 @@ async def list_tasks(db: PostgresqlDatabase = Depends(get_db)):
     ]
 
 
-@router.post("/tasks", response_model=task_schema.TaskCreateResponse)
+@router.post("", response_model=task_schema.TaskCreateResponse)
 async def create_task(
     task_body: task_schema.TaskCreate, db: PostgresqlDatabase = Depends(get_db)
 ):
@@ -51,7 +53,7 @@ async def create_task(
     return await task_crud.create_task(db, task_body)
 
 
-@router.put("/tasks/{task_id}")
+@router.put("/{task_id}")
 async def update_task(
     task_id: int,
     task_body: task_schema.TaskCreate,
@@ -75,7 +77,7 @@ async def update_task(
     return await task_crud.update_task(db, task_body, original=task, task_id=task_id)
 
 
-@router.delete("/tasks/{task_id}", response_model=None)
+@router.delete("/{task_id}", response_model=None)
 async def delete_task(task_id: int, db: PostgresqlDatabase = Depends(get_db)) -> bool:
     task = await task_crud.get_task_del(task_id=task_id)
     # task = None
