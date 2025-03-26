@@ -16,6 +16,7 @@ def migrate_up():
       modified_by INTEGER,
       start_date DATE NOT NULL,
       end_date DATE NOT NULL,
+      is_done BOOLEAN DEFAULT false,
       active BOOLEAN DEFAULT TRUE NOT NULL,
       PRIMARY KEY (id),
       UNIQUE (title)
