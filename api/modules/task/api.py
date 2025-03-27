@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import Json
 import modules.task.schemas as task_schema
@@ -5,6 +6,7 @@ import modules.task.service as task_crud
 from db import get_db
 from peewee import PostgresqlDatabase
 import config as config
+from modules.task.model import Task
 
 db = PostgresqlDatabase(
     config.DB,
@@ -19,24 +21,15 @@ router = APIRouter(
 )
 
 
-@router.get("", response_model=list[task_schema.Task])
+@router.get("", response_model= Optional[list[task_schema.Task]])
 async def list_tasks(db: PostgresqlDatabase = Depends(get_db)):
-    task = await task_crud.get_tasks_with_done()
+    query = {
+        "id": 1
+    }
+    task = await Task.find(**query)
     if task is None:
         raise HTTPException(status_code=404, detail="タスクは存在しません")
-    task.sort()
-    return [
-        task_schema.Task(
-            id=i[0],
-            title=i[1],
-            category=i[2],
-            status_id=i[3],
-            staff_id=i[4],
-            priority_id=i[5],
-            start_date=i[6],
-        )
-        for i in task
-    ]
+    return task
 
 
 @router.post("", response_model=task_schema.TaskCreateResponse)

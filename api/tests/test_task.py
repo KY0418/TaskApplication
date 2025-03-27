@@ -2,7 +2,7 @@ import pytest
 from peewee import PostgresqlDatabase
 from fastapi.testclient import TestClient
 from main import app
-from modules.task.models import Task
+from modules.task.model import Task
 from modules.task.schemas import TaskCreate, TaskCreateResponse
 from modules.task.api import create_task, update_task, delete_task
 from modules.status.models import Status

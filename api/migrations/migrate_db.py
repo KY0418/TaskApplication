@@ -1,6 +1,6 @@
 from typing import Optional
 from peewee import PostgresqlDatabase
-from modules.task.models import Task
+from modules.task.model import Task
 from modules.status.models import Status
 from modules.staff.models import Staff
 from modules.importance.models import Priority
