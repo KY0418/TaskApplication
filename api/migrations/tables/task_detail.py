@@ -19,7 +19,7 @@ def migrate_up():
       is_done BOOLEAN DEFAULT false,
       active BOOLEAN DEFAULT TRUE NOT NULL,
       PRIMARY KEY (id),
-      UNIQUE (title)
+      CONSTRAINT unique_task_detail_title UNIQUE (title)
     );
     CREATE INDEX IF NOT EXISTS main_search_key ON task_detail (priority_id,status_id, staff_id);
   """)

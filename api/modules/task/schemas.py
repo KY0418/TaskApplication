@@ -1,23 +1,17 @@
-from pydantic import BaseModel,Field
-import datetime
+from pydantic import Field
+from modules.common.schema import ExtentionSchema
+from modules.task_detail.schema import TaskDetail
 
-class TaskBase(BaseModel):
-    # title : str = Field(None)
+class TaskBase(ExtentionSchema):
     category_id: int
+    task_detail: list[TaskDetail]
     active: bool
-    # due_date: datetime.date | str | None  = Field(None)
-    # category: str = Field(None)
-    # status_id: int = Field(None)
-    # staff_id: str = Field(None)
-    # priority_id: int = Field(None)
-    # start_date: datetime.date | str  = Field(None)
 
-class TaskUpdate(BaseModel):
-    title : str = Field(None)
-    # due_date: datetime.date | str | None  = Field(None)
-    status_id: int = Field(None)
-    priority_id: int = Field(None)
-    staff_id: str = Field(None)
+class TaskUpdate(ExtentionSchema):
+    title : str = Field(description="タイトル")
+    status_id: int = Field(description="ステータスID")
+    priority_id: int = Field(description="優先度ID")
+    staff_id: str = Field(description="従業員ID")
 
 class TaskCreate(TaskBase):
     pass
@@ -30,7 +24,4 @@ class TaskCreateResponse(TaskCreate):
 
 class Task(TaskBase):
     id : int
-    is_done: bool = Field(default=False,json_schema_extra={"description":"完了フラグ"})
-    class ConfigDict:
-        from_attributes = True
     

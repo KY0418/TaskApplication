@@ -14,15 +14,15 @@ services:
     tty: true
 
   postgresql:
-    image: postgres:14
-    container_name: postgres_re
+    image: sibedge/postgres-plv8:15.3-3.1.6
+    container_name: task_postgres
     environment:
       POSTGRES_DB: task_data
       POSTGRES_USER: kaneko
       POSTGRES_PASSWORD: goldsilver
       TZ: Asia/Tokyo
     volumes:
-      - postgres_data:/var/lib/postgres
+      - ta_postgres_data:/var/lib/postgres
 
     ports:
       - 5432:5432
@@ -44,7 +44,7 @@ services:
 volumes:
   dockerenv:
     driver: local
-  postgres_data:
+  ta_postgres_data:
     driver: local
   frontend:
     driver: local

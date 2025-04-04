@@ -1,5 +1,5 @@
 from peewee import ForeignKeyField
-from modules.task.models import Task
+from modules.task.model import Task
 from db import Base
 
 
