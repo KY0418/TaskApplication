@@ -6,6 +6,7 @@ def migrate_up():
       RETURNS TRIGGER AS $$
       BEGIN 
         NEW.created_at := NOW();
+        RETURN NEW;
       END;
       $$ LANGUAGE plpgsql;
 
@@ -13,6 +14,7 @@ def migrate_up():
       RETURNS TRIGGER AS $$
       BEGIN 
         NEW.modified_at := NOW();
+        RETURN NEW;
       END;
       $$ LANGUAGE plpgsql;
 

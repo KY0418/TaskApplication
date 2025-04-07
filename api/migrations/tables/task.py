@@ -5,7 +5,7 @@ def migrate_up():
     DROP TABLE IF EXISTS task;
     CREATE TABLE task (
       id SERIAL NOT NULL,
-      category_id INTEGER NOT NULL,
+      header_title TEXT NOT NULL,
       active BOOLEAN DEFAULT TRUE NOT NULL,
       PRIMARY KEY (id)
     ); 

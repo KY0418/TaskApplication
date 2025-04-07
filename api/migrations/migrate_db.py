@@ -1,6 +1,6 @@
 from typing import Optional
 from peewee import PostgresqlDatabase
-from modules.task.model import Task
+from modules.task.model import TaskModel
 from modules.status.models import Status
 from modules.staff.models import Staff
 from modules.importance.models import Priority
@@ -59,8 +59,8 @@ def initialize_importance():
         status_table = Status(status=i)
         status_table.save()
 def reset_database():
-    engine.drop_tables([Task,Done,Status,Staff,Priority],cascade="CASCADE")
-    engine.create_tables([Task,Done,Status,Staff,Priority])
+    engine.drop_tables([TaskModel,Done,Status,Staff,Priority],cascade="CASCADE")
+    engine.create_tables([TaskModel,Done,Status,Staff,Priority])
 
 if __name__ == "__main__":
     cli()
