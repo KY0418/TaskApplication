@@ -1,12 +1,13 @@
-from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException
-from pydantic import Json
-import modules.task.schemas as task_schema
-import modules.task.service as task_crud
+from typing import Optional, Union
+from fastapi import APIRouter, Depends
+from modules.task.schema import TaskCreateSchema, Task, TaskUpdateSchema
+from modules.task.service import TaskService
 from db import get_db
 from peewee import PostgresqlDatabase
 import config as config
-from modules.task.model import Task
+from modules.task.model import TaskModel
+from modules.common.errors import ErrorCollectionWrapper
+from modules.common.schema import response_id_schema, response_bool_schema
 
 db = PostgresqlDatabase(
     config.DB,
@@ -16,65 +17,36 @@ db = PostgresqlDatabase(
     host=config.DB_HOST,
 )
 
-router = APIRouter(
-    prefix='/tasks',
-)
+router = APIRouter(prefix="/tasks", tags=["tasks"])
 
 
-@router.get("", response_model= Optional[list[task_schema.Task]])
+@router.get("")
 async def list_tasks(db: PostgresqlDatabase = Depends(get_db)):
-    query = {
-        "id": 1
-    }
-    task = await Task.find(**query)
+    task = await TaskService().get_tasks()
     if task is None:
-        raise HTTPException(status_code=404, detail="タスクは存在しません")
+        ErrorCollectionWrapper().not_found(msg="タスクが存在しません。")
     return task
 
 
-@router.post("", response_model=task_schema.TaskCreateResponse)
+@router.post("", response_model=Union[response_id_schema, None])
 async def create_task(
-    task_body: task_schema.TaskCreate, db: PostgresqlDatabase = Depends(get_db)
+    payload: TaskCreateSchema, db: PostgresqlDatabase = Depends(get_db)
 ):
-    task = await task_crud.get_tasks_with_done()
-    title = task_body.title
-    if task is None:
-        raise HTTPException(status_code=404, detail="タスクが存在しません")
-    for i in task:
-        if i[1] == title:
-            raise HTTPException(status_code=409, detail="タスクは既に存在しています")
-    return await task_crud.create_task(db, task_body)
+    task_id = await TaskService().create_task(payload)
+    return task_id
 
 
-@router.put("/{task_id}")
+@router.put("/{task_id}", response_model=response_id_schema)
 async def update_task(
+    payload: TaskUpdateSchema,
     task_id: int,
-    task_body: task_schema.TaskCreate,
     db: PostgresqlDatabase = Depends(get_db),
 ):
-    # ID検索結果のタイトルを格納している
-    task = await task_crud.get_task(task_id=task_id)
-    task_check = await task_crud.get_tasks_with_done()
-    if task is None:
-        raise HTTPException(status_code=404, detail="タスクが存在しません")
-    for i in task_check:
-        if i[1] == task_body.title and (
-            i[3] != task_body.status_id
-            or i[2] != task_body.category
-            or i[4] != task_body.staff_id
-            or i[5] != task_body.priority_id
-        ):
-            break
-        elif i[1] == task_body.title:
-            raise HTTPException(status_code=409, detail="タスクは既に存在しています")
-    return await task_crud.update_task(db, task_body, original=task, task_id=task_id)
+    updated = await TaskService().update_task(payload=payload, id=task_id)
+    return response_id_schema(id=updated)
 
 
-@router.delete("/{task_id}", response_model=None)
+@router.patch("/{task_id}", response_model=response_bool_schema)
 async def delete_task(task_id: int, db: PostgresqlDatabase = Depends(get_db)) -> bool:
-    task = await task_crud.get_task_del(task_id=task_id)
-    # task = None
-    if task is None:
-        raise HTTPException(status_code=404, detail="タスクは存在しません")
-
-    return await task_crud.delete_task(db, original=task)
+    await TaskService().soft_delete(task_id=task_id)
+    return response_bool_schema(is_successfull=True)

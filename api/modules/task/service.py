@@ -1,13 +1,12 @@
 from fastapi import HTTPException
-from peewee import PostgresqlDatabase, DoesNotExist
 from modules.task.model import TaskModel
 from modules.task_detail.model import TaskDetailModel
-from modules.task.schema import TaskCreateSchema
+from modules.task.schema import TaskCreateSchema, TaskUpdateSchema
 from modules.task_detail.schema import TaskDetailCreateSchema
-from typing import List
 from modules.common.service import ExtensionService
 from modules.common.errors import ErrorCollectionWrapper
 from db import db
+from peewee import JOIN, fn
 
 
 class TaskService(ExtensionService):
@@ -15,11 +14,52 @@ class TaskService(ExtensionService):
     model_class = TaskModel
 
     @classmethod
-    async def create_task(cls,payload:TaskCreateSchema):
-        task_data = {"header_title": payload.header_title,"active": payload.active}
+    async def get_tasks(cls):
+        json_fields = fn.json_agg(
+            fn.json_build_object(
+                "id",
+                TaskDetailModel.id,
+                "title",
+                TaskDetailModel.title,
+                "task_id",
+                TaskDetailModel.task_id,
+                "priority_id",
+                TaskDetailModel.priority_id,
+                "status_id",
+                TaskDetailModel.status_id,
+                "staff_id",
+                TaskDetailModel.staff_id,
+                "created_by",
+                TaskDetailModel.created_by,
+                "modified_by",
+                TaskDetailModel.modified_by,
+                "start_date",
+                TaskDetailModel.start_date,
+                "end_date",
+                TaskDetailModel.end_date,
+                "is_done",
+                TaskDetailModel.is_done,
+                "active",
+                TaskDetailModel.active,
+            )
+        ).alias("task_detail")
+        result = (
+            TaskModel.select(TaskModel, json_fields)
+            .join(
+                TaskDetailModel, JOIN.INNER, on=TaskModel.id == TaskDetailModel.task_id
+            )
+            .group_by(TaskModel.id)
+            .dicts()
+        )
+        print(list(result))
+        return list(result)
+
+    @classmethod
+    async def create_task(cls, payload: TaskCreateSchema):
+        task_data = {"header_title": payload.header_title, "active": payload.active}
         with db.atomic():
             try:
-                new_task_id = await super()._create(cls.model_class,**task_data)
+                new_task_id = await super()._create(cls.model_class, **task_data)
                 task_detail_data = []
                 for item in payload.task_detail:
                     data = {
@@ -30,7 +70,7 @@ class TaskService(ExtensionService):
                         "staff_id": item.staff_id,
                         "start_date": item.start_date,
                         "end_date": item.end_date,
-                        "active": item.active
+                        "active": item.active,
                     }
                     task_detail_data.append(data)
                 await cls().validate_duplicate_task_detail(task_detail_data)
@@ -44,51 +84,43 @@ class TaskService(ExtensionService):
                 ErrorCollectionWrapper().server_error(msg="システムエラーです。")
                 raise e
 
-    @classmethod   
-    async def validate_duplicate_task_detail(cls,payload:list[TaskDetailCreateSchema]):
+    @classmethod
+    async def validate_duplicate_task_detail(
+        cls, payload: list[TaskDetailCreateSchema]
+    ):
         for data in payload:
             record = TaskDetailModel.get_or_none(TaskDetailModel.title == data["title"])
             if record is not None:
                 ErrorCollectionWrapper().conflicted(msg="そのタスクは既に存在します。")
 
     @classmethod
-    async def update_task(
-        task_create: TaskCreateSchema,
-        original: TaskModel,
-        task_id: int,
-    ) -> TaskModel:
-        task = TaskModel.get(TaskModel.id == task_id)
-        task.title = task_create.title if task_create.title else task.title
-        task.category = task_create.category if task_create.category else task.category
-        task.status_id = task_create.status_id if task_create.status_id else task.status_id
-        task.priority_id = (
-            task_create.priority_id if task_create.priority_id else task.priority_id
-        )
-        task.staff_id = task_create.staff_id if task_create.staff_id else task.staff_id
-        task.save()
-        return task
+    async def is_existance_task(cls, id: int, model: TaskModel | TaskDetailModel):
+        record = model.get_or_none(model.id == id)
+        if record is None:
+            ErrorCollectionWrapper().not_found(msg="そのタスクは存在しません。")
 
-    async def get_task(task_id: int) -> List[TaskModel] | None:
-        result = TaskModel.select(
-            TaskModel.title,
-        ).filter(TaskModel.id == task_id)
-        return [(i.title) for i in result]
+    @classmethod
+    async def update_task(cls, payload: TaskUpdateSchema, id: int):
+        task_payload = {"header_title": payload.header_title, "active": payload.active}
+        task_detail_payload = payload.task_detail
+        with db.atomic():
+            try:
+                cls().is_existance_task(id, TaskModel)
+                TaskModel.update(**task_payload).where(TaskModel.id == id).execute()
+                for td in task_detail_payload:
+                    cls().is_existance_task(id, TaskDetailModel)
+                    TaskDetailModel.update(td.dict()).where(
+                        TaskDetailModel.id == td.id
+                    ).execute()
+            except HTTPException as e:
+                db.rollback()
+                raise e
+        return id
 
-
-    async def delete_task(db: PostgresqlDatabase, original: int) -> bool:
-        task = TaskModel.get(TaskModel.id == original)
-        task.delete_instance()
+    @classmethod
+    async def soft_delete(cls, task_id: int) -> bool:
         try:
-            task.save()
-            return True
-        except Exception as e:
+            cls().is_existance_task(task_id, TaskModel)
+            TaskModel.update(active=False).where(TaskModel.id == task_id)
+        except HTTPException as e:
             raise e
-            return False
-
-
-    async def get_task_del(task_id: int) -> List[TaskModel] | None:
-        try:
-            task = TaskModel.get_by_id(task_id)
-            return [task]
-        except DoesNotExist:
-            return None
